@@ -21,4 +21,4 @@ volumes:
       enabled: true
 
 nodeSelector:
-  node_purpose: ci
+  node_purpose: bitcoin-digging
