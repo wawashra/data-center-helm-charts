@@ -15,5 +15,8 @@ spec:
       targetPort: hazelcast
       protocol: TCP
       name: hazelcast
+    {{- with .Values.additionalServicePorts }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
   selector:
     {{- include "confluence.selectorLabels" . | nindent 4 }}

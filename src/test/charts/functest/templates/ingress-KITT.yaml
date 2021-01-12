@@ -39,6 +39,11 @@ spec:
         response: 120s
       loadBalancerPolicy:
         strategy: Cookie
+    - conditions:
+        - prefix: /download-sidecar
+      services:
+        - name: {{ $serviceName }}
+          port: 8081
     {{ end }}
 ---
 {{ end }}

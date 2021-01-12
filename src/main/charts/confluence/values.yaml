@@ -247,3 +247,5 @@ additionalInitContainers: []
 
 # -- Additional labels that should be applied to all resources
 additionalLabels: {}
+
+additionalServicePorts: []

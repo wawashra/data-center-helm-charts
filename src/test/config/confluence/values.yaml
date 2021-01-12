@@ -7,6 +7,7 @@ confluence:
     secretName: confluence-license
   additionalJvmArgs:
     - -Datlassian.allow.insecure.url.parameter.login=true
+    - -Dconfluence.signedDownloadRedirect.uri=/download-sidecar
   resources:
     container:
       requests:
@@ -20,3 +21,25 @@ database:
 
 synchrony:
   enabled: true
+
+image:
+  name: docker.atl-paas.net/atlassian/confluence-server:DCNG-K8SCONF20-1
+
+additionalServicePorts:
+  - port: 8081
+    targetPort: 8081
+    protocol: TCP
+    name: download-sidecar
+
+additionalContainers:
+  - name: download-sidecar
+    image: docker.atl-paas.net/kmacleod/download-sidecar:0.0.1-SNAPSHOT
+    ports:
+      - containerPort: 8081
+    volumeMounts:
+      - name: shared-home
+        mountPath: /shared-home
+        subPath: ${helm.release.prefix}-confluence
+    env:
+      - name: ATTACHMENTS_ROOTDIR
+        value: /shared-home/attachments/ver003
