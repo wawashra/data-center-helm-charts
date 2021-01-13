@@ -12,23 +12,12 @@ volumes:
     persistentVolumeClaim:
       create: true
   sharedHome:
-    persistentVolume:
-      create: true
-      mountOptions:
-        - rw
-        - nfsvers=3
-        - lookupcache=pos
-        - noatime
-        - intr
-        - rsize=32768
-        - wsize=32768
-        - _netdev
-      nfs:
-        path: "/srv/nfs"
-    persistentVolumeClaim:
-      create: true
-      storageClassName: ""
-      volumeName: ${helm.release.prefix}-bitbucket-shared-home-pv
+    customVolume:
+      persistentVolumeClaim:
+        claimName: efs-claim # Pre-provisioned, and shared by all of our pods
+    subPath: ${helm.release.prefix}-bitbucket # Since all of our pods share the same EFS PV, we use subpath mounts to prevent interference
+    nfsPermissionFixer:
+      enabled: true
 
 nodeSelector:
   node_purpose: ci
