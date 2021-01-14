@@ -1,0 +1,134 @@
+{{/*This describes a k8s StatefulSet for deploying Bitbucket for testing*/}}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "bitbucket.fullname" . }}
+  labels:
+    {{- include "bitbucket.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  serviceName: {{ include "bitbucket.fullname" . }}
+  selector:
+    matchLabels:
+      {{- include "bitbucket.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "bitbucket.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "bitbucket.serviceAccountName" . }}
+      terminationGracePeriodSeconds: 1
+      securityContext:
+        # This is intended to ensure that the shared-home volume is group-writeable by the GID used by the Bitbucket container.
+        # However, this doesn't appear to work for NFS volumes due to a K8s bug: https://github.com/kubernetes/examples/issues/260
+        fsGroup: 2003 # Makes sure that the shared-home volume mount is writeable by the bitbucket user's GID
+      {{- with .Values.additionalInitContainers }}
+      initContainers:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: {{ include "bitbucket.image" . | quote }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.bitbucket.ports.http }}
+              protocol: TCP
+            - name: ssh
+              containerPort: {{ .Values.bitbucket.ports.ssh }}
+              protocol: TCP
+            - name: hazelcast
+              containerPort: {{ .Values.bitbucket.ports.hazelcast }}
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              port: {{ .Values.bitbucket.ports.http }}
+              path: "/status"
+            periodSeconds: 5
+            failureThreshold: 60
+            initialDelaySeconds: 10
+          volumeMounts:
+            - name: local-home
+              mountPath: {{ .Values.volumes.localHome.mountPath | quote }}
+            - name: shared-home
+              mountPath: {{ .Values.volumes.sharedHome.mountPath | quote }}
+              {{- if .Values.volumes.sharedHome.subPath }}
+              subPath: {{ .Values.volumes.sharedHome.subPath | quote }}
+              {{- end }}
+            {{- with .Values.bitbucket.additionalVolumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+            {{- include "bitbucket.additionalLibraries" . | nindent 12 }}
+            {{- include "bitbucket.additionalBundledPlugins" . | nindent 12 }}
+          {{- with .Values.bitbucket.resources.container }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          env:
+            {{- include "bitbucket.clusteringEnvVars" . | nindent 12 }}
+            {{- include "bitbucket.databaseEnvVars" . | nindent 12 }}
+            {{- include "bitbucket.sysadminEnvVars" . | nindent 12 }}
+            {{- include "bitbucket.elasticSearchEnvVars" . | nindent 12 }}
+            {{ if .Values.ingress.host }}
+            - name: SERVER_PROXY_NAME
+              value: {{ .Values.ingress.host | quote }}
+            - name: SERVER_PROXY_PORT
+              value: {{ include "bitbucket.ingressPort" . | quote }}
+            - name: SETUP_BASEURL
+              value: {{ include "bitbucket.baseUrl" . | quote }}
+            {{ end }}
+            {{ if .Values.ingress.https }}
+            - name: SERVER_SCHEME
+              value: "https"
+            - name: SERVER_SECURE
+              value: "true"
+            {{ end }}
+            - name: BITBUCKET_SHARED_HOME
+              value: {{ .Values.volumes.sharedHome.mountPath | quote }}
+            {{ with .Values.bitbucket.license.secretName }}
+            - name: SETUP_LICENSE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ . }}
+                  key: {{ $.Values.bitbucket.license.secretKey }}
+            {{ end }}
+            - name: JVM_MINIMUM_MEMORY
+              valueFrom:
+                configMapKeyRef:
+                  key: min_heap
+                  name: {{ include "bitbucket.fullname" . }}-jvm-config
+            - name: JVM_MAXIMUM_MEMORY
+              valueFrom:
+                configMapKeyRef:
+                  key: max_heap
+                  name: {{ include "bitbucket.fullname" . }}-jvm-config
+            - name: JVM_SUPPORT_RECOMMENDED_ARGS
+              valueFrom:
+                configMapKeyRef:
+                  key: additional_jvm_args
+                  name: {{ include "bitbucket.fullname" . }}-jvm-config
+            {{- with .Values.bitbucket.additionalEnvironmentVariables }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+        {{- with .Values.additionalContainers }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        {{ include "bitbucket.volumes" . | nindent 8 }}
+  {{ include "bitbucket.volumeClaimTemplates" . | nindent 2 }}
