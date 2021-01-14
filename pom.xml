@@ -74,11 +74,13 @@
 
         <log.download.dir>${project.build.directory}/logs</log.download.dir>
 
-        <kubernetes.target.namespace>dcng</kubernetes.target.namespace>
+        <kubernetes.target.namespace>dcd</kubernetes.target.namespace>
 
         <kubernetes.ingress.domain>internal.shared-dev.us-west-2.kitt-inf.net</kubernetes.ingress.domain>
         <kitt.ingress.domain>${kubernetes.ingress.domain}</kitt.ingress.domain>
         <eks.ingress.domain>dcngkube.bbsperf.com</eks.ingress.domain>
+
+        <shared.pvc.name>efs-claim</shared.pvc.name>
 
         <persistence.enabled>true</persistence.enabled>
 
