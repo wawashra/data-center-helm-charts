@@ -25,3 +25,34 @@ volumes:
     subPath: ${helm.release.prefix}-bitbucket # Since all of our pods share the same EFS PV, we use subpath mounts to prevent interference
     nfsPermissionFixer:
       enabled: true
+
+fluentd:
+  enabled: true
+  elasticsearch:
+    hostname: elasticsearch-master
+
+bitbucket:
+  logging:
+    customLogbackConfig: |
+      <?xml version="1.0"?>
+      <included>
+
+          <appender name="fluency.sync" class="ch.qos.logback.more.appenders.FluencyLogbackAppender">
+              <!-- Location of the fluentd service -->
+              <remoteHost>localhost</remoteHost>
+              <port>24224</port>
+          </appender>
+
+          <appender name="fluency.async" class="ch.qos.logback.classic.AsyncAppender">
+              <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+                  <level>${logging.fluentd.level:-OFF}</level>
+              </filter>
+              <neverBlock>true</neverBlock>
+              <appender-ref ref="fluency.sync" />
+          </appender>
+
+          <root>
+              <appender-ref ref="bitbucket.application"/>
+              <appender-ref ref="fluency.async"/>
+          </root>
+      </included>

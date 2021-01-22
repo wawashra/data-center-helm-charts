@@ -151,6 +151,9 @@ bitbucket:
   # See https://hub.docker.com/r/atlassian/bitbucket-server for supported variables.
   additionalEnvironmentVariables: []
 
+  logging:
+    customLogbackConfig:
+
 ingress:
   # -- True if an Ingress should be created.
   create: false

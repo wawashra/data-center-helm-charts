@@ -87,6 +87,7 @@ spec:
         # This is intended to ensure that the shared-home volume is group-writeable by the GID used by the Bitbucket container.
         # However, this doesn't appear to work for NFS volumes due to a K8s bug: https://github.com/kubernetes/examples/issues/260
         fsGroup: 2003 # Makes sure that the shared-home volume mount is writeable by the bitbucket user's GID
+      initContainers:
       containers:
         - name: bitbucket
           image: "atlassian/bitbucket-server:7.7.0-jdk11"
