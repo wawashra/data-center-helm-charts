@@ -26,7 +26,6 @@ data:
   additional_jvm_args: >-
     -Dconfluence.cluster.hazelcast.listenPort=5701
     -Dsynchrony.btf.disabled=true
-    -DConfluenceHomeLogAppender.disabled=true
     -Dconfluence.clusterNodeName.useHostname=true
   max_heap: 1g
   min_heap: 1g
@@ -85,7 +84,7 @@ spec:
       serviceAccountName: unittest-confluence
       terminationGracePeriodSeconds: 1
       securityContext:
-        # This is intended to ensure that the shared-home volume is group-writeable by the GID used by the Cnfluence container.
+        # This is intended to ensure that the shared-home volume is group-writeable by the GID used by the Confluence container.
         # However, this doesn't appear to work for NFS volumes due to a K8s bug: https://github.com/kubernetes/examples/issues/260
         fsGroup: 2002
       containers:
@@ -121,6 +120,10 @@ spec:
               value: "true"
             - name: ATL_TOMCAT_ACCESS_LOG
               value: "true"
+            - name: UMASK
+              value: "0022"
+            - name: SET_PERMISSIONS
+              value: "false"
             - name: ATL_PRODUCT_HOME_SHARED
               value: "/var/atlassian/application-data/shared-home"
             - name: JVM_SUPPORT_RECOMMENDED_ARGS

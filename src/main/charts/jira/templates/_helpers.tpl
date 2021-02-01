@@ -81,7 +81,7 @@ The command that should be run by the nfs-fixer init container to correct the pe
 {{- if .Values.volumes.sharedHome.nfsPermissionFixer.command }}
 {{ .Values.volumes.sharedHome.nfsPermissionFixer.command }}
 {{- else }}
-{{- printf "(chgrp %s %s; chmod g+w %s)" .Values.jira.gid .Values.volumes.sharedHome.nfsPermissionFixer.mountPath .Values.volumes.sharedHome.nfsPermissionFixer.mountPath }}
+{{- printf "(chgrp %s %s; chmod g+w %s)" .Values.jira.securityContext.gid .Values.volumes.sharedHome.nfsPermissionFixer.mountPath .Values.volumes.sharedHome.nfsPermissionFixer.mountPath }}
 {{- end }}
 {{- end }}
 
@@ -234,3 +234,9 @@ volumeClaimTemplates:
       fieldPath: status.podIP
 {{ end }}
 {{ end }}
+
+{{- define "jira.sysprop.fluentdAppender" -}}
+{{- if .Values.fluentd.enabled -}}
+-Datlassian.logging.cloud.enabled=true
+{{- end -}}
+{{- end }}

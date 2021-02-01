@@ -21,10 +21,12 @@ spec:
     spec:
       serviceAccountName: {{ include "confluence.serviceAccountName" . }}
       terminationGracePeriodSeconds: 1
+{{ if .Values.confluence.securityContext.enabled }}
       securityContext:
-        # This is intended to ensure that the shared-home volume is group-writeable by the GID used by the Cnfluence container.
+        # This is intended to ensure that the shared-home volume is group-writeable by the GID used by the Confluence container.
         # However, this doesn't appear to work for NFS volumes due to a K8s bug: https://github.com/kubernetes/examples/issues/260
-        fsGroup: {{ .Values.confluence.gid }}
+        fsGroup: {{ .Values.confluence.securityContext.gid }}
+{{ end }}
       {{- with .Values.additionalInitContainers }}
       initContainers:
         {{- toYaml . | nindent 8 }}
@@ -67,6 +69,10 @@ spec:
             {{ end }}
             - name: ATL_TOMCAT_ACCESS_LOG
               value: {{ .Values.confluence.accessLog.enabled | quote }}
+            - name: UMASK
+              value: {{ .Values.confluence.umask | quote }}
+            - name: SET_PERMISSIONS
+              value: "false"
             - name: ATL_PRODUCT_HOME_SHARED
               value: {{ .Values.volumes.sharedHome.mountPath | quote }}
             - name: JVM_SUPPORT_RECOMMENDED_ARGS
@@ -101,9 +107,10 @@ spec:
             {{- with .Values.confluence.additionalEnvironmentVariables }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
+        {{- include "fluentd.container" . | nindent 8 }}
         {{- with .Values.additionalContainers }}
         {{- toYaml . | nindent 8 }}
-      {{- end }}
+        {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
       {{- toYaml . | nindent 8 }}
@@ -118,4 +125,5 @@ spec:
       {{- end }}
       volumes:
         {{ include "confluence.volumes" . | nindent 8 }}
+        {{ include "fluentd.config.volume" . | nindent 8 }}
   {{ include "confluence.volumeClaimTemplates" . | nindent 2 }}

@@ -21,10 +21,12 @@ spec:
     spec:
       serviceAccountName: {{ include "jira.serviceAccountName" . }}
       terminationGracePeriodSeconds: 1
+{{ if .Values.jira.securityContext.enabled }}
       securityContext:
         # This is intended to ensure that the shared-home volume is group-writeable by the GID used by the Jira container.
         # However, this doesn't appear to work for NFS volumes due to a K8s bug: https://github.com/kubernetes/examples/issues/260
-        fsGroup: {{ .Values.jira.gid }}
+        fsGroup: {{ .Values.jira.securityContext.gid }}
+{{ end }}
       {{- with .Values.additionalInitContainers }}
       initContainers:
         {{- toYaml . | nindent 8 }}
@@ -42,6 +44,13 @@ spec:
               {{ end }}
             {{- include "jira.databaseEnvVars" . | nindent 12 }}
             {{- include "jira.clusteringEnvVars" . | nindent 12 }}
+            {{ with .Values.jira.license.secretName }}
+            - name: JIRA_SETUP_LICENSE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ . }}
+                  key: {{ $.Values.jira.license.secretKey }}
+            {{ end }}
             - name: JIRA_SHARED_HOME
               value: {{ .Values.volumes.sharedHome.mountPath | quote }}
             - name: JVM_SUPPORT_RECOMMENDED_ARGS
@@ -89,9 +98,10 @@ spec:
             {{- end }}
             {{- include "jira.additionalLibraries" . | nindent 12 }}
             {{- include "jira.additionalBundledPlugins" . | nindent 12 }}
+        {{- include "fluentd.container" . | nindent 8 }}
         {{- with .Values.additionalContainers }}
         {{- toYaml . | nindent 8 }}
-      {{- end }}
+        {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
       {{- toYaml . | nindent 8 }}
@@ -106,4 +116,5 @@ spec:
       {{- end }}
       volumes:
         {{ include "jira.volumes" . | nindent 8 }}
+        {{ include "fluentd.config.volume" . | nindent 8 }}
   {{ include "jira.volumeClaimTemplates" . | nindent 2 }}

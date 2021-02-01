@@ -3,14 +3,18 @@
 set -e
 set -x
 
-getClusterType() {
-  local currentContext=$1
+getCurrentClusterType() {
+  local serverAddress=$(kubectl config view --minify -o json | jq -r '.clusters[0].cluster.server')
 
-  case "${currentContext}" in
-    *eks*) echo EKS;;
-    *aks*) echo AKS;;
-    *gke*) echo GKE;;
-    *shared-dev*|*default-context*) echo KITT;;
+  case "${serverAddress}" in
+    *.eks.amazonaws.com*) echo EKS; return;;
+    *.azmk8s.io*) echo AKS; return;;
+    *.kitt-inf.net*) echo KITT; return;;
+  esac
+
+  local clusterName=$(kubectl config view --minify -o json | jq -r '.clusters[0].name')
+  case "$clusterName" in
+    gke*) echo GKE;;
     *) echo CUSTOM;;
   esac
 }
@@ -29,6 +33,12 @@ if [ "${BASH_VERSINFO:-0}" -lt 4 ]; then
   exit 1
 fi
 
+if ! command -v jq &> /dev/null
+then
+    echo "The 'jq' command line JSON processor is required to run this script."
+    exit 1
+fi
+
 THISDIR=$(dirname "$0")
 
 source $1
@@ -44,7 +54,7 @@ currentContext=$(kubectl config current-context)
 
 echo Current context: $currentContext
 
-clusterType=$(getClusterType $currentContext)
+clusterType=$(getCurrentClusterType)
 
 echo "Cluster type is $clusterType"
 
@@ -53,7 +63,9 @@ helm repo add bitnami https://charts.bitnami.com/bitnami --force-update
 
 mkdir -p "$LOG_DOWNLOAD_DIR"
 
-chartValueFiles=$(ls $CHART_TEST_VALUES_BASEDIR/$PRODUCT_NAME/{values.yaml,values-${clusterType}.yaml} 2>/dev/null || true)
+chartValueFiles=$(for file in $CHART_TEST_VALUES_BASEDIR/$PRODUCT_NAME/{values.yaml,values-${clusterType}.yaml}; do
+  ls "$file" 2>/dev/null || true
+done)
 
 if grep -q nfs: ${chartValueFiles} /dev/null; then
     echo This configuration requires a private NFS server, starting...

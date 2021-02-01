@@ -46,8 +46,12 @@ jira:
     port: 80
     # -- The type of Kubernetes service to use for Jira
     type: ClusterIP
-  # -- The GID used by the Jira docker image
-  gid: "2001"
+  # -- Enable or disable security context in StatefulSet template spec. Enabled by default with UID 2001.
+  # -- Disable when deploying to OpenShift, unless anyuid policy is attached to a service account
+  securityContext:
+    enabled: true
+    # -- The GID used by the Jira docker image
+    gid: "2001"
 
   ports:
     # -- The port on which the Jira container listens for HTTP traffic
@@ -70,6 +74,14 @@ jira:
     # -- Set to true if Data Center clustering should be enabled
     # This will automatically configure cluster peer discovery between cluster nodes.
     enabled: false
+
+  license:
+    # -- The name of the Kubernetes Secret which contains the Jira license key.
+    # If specified, then the license will be automatically populated during Jira setup.
+    # Otherwise, it will need to be provided via the browser after initial startup.
+    secretName:
+    # -- The key in the Kubernetes Secret which contains the Jira license key
+    secretKey: license-key
 
   resources:
     jvm:
@@ -137,6 +149,21 @@ ingress:
   # -- Secret that contains a TLS private key and certificate.
   # Optional if Ingress Controller is configured to use one secret for all ingresses
   tlsSecretName:
+
+fluentd:
+  # -- True if the fluentd sidecar should be added to each pod
+  enabled: false
+  # -- The name of the image containing the fluentd sidecar
+  imageName: fluent/fluentd-kubernetes-daemonset:v1.11.5-debian-elasticsearch7-1.2
+  # -- The port on which the fluentd sidecar will listen
+  httpPort: 9880
+  elasticsearch:
+    # -- True if fluentd should send all log events to an elasticsearch service.
+    enabled: true
+    # -- The hostname of the Elasticsearch service that fluentd should send logs to.
+    hostname: elasticsearch
+    # -- The prefix of the elasticsearch index name that will be used
+    indexNamePrefix: jira
 
 # -- Specify custom annotations to be added to all Jira pods
 podAnnotations: {}

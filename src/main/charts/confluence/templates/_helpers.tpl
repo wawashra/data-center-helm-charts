@@ -145,16 +145,18 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 -Dconfluence.clusterNodeName.useHostname={{ .Values.confluence.clustering.usePodNameAsClusterNodeName }}
 {{- end }}
 
+{{- define "confluence.sysprop.fluentdAppender" -}}
+{{- if .Values.fluentd.enabled -}}
+-Datlassian.logging.cloud.enabled=true
+{{- end -}}
+{{- end }}
+
 {{- define "confluence.sysprop.synchronyServiceUrl" -}}
 {{- if .Values.synchrony.enabled -}}
 -Dsynchrony.service.url={{ .Values.synchrony.ingressUrl }}/v1
 {{- else -}}
 -Dsynchrony.btf.disabled=true
 {{- end -}}
-{{- end }}
-
-{{- define "confluence.sysprop.disableHomeLogAppender" -}}
--DConfluenceHomeLogAppender.disabled=true
 {{- end }}
 
 {{/*
@@ -164,7 +166,7 @@ The command that should be run by the nfs-fixer init container to correct the pe
 {{- if .Values.volumes.sharedHome.nfsPermissionFixer.command }}
 {{ .Values.volumes.sharedHome.nfsPermissionFixer.command }}
 {{- else }}
-{{- printf "(chgrp %s %s; chmod g+w %s)" .Values.confluence.gid .Values.volumes.sharedHome.nfsPermissionFixer.mountPath .Values.volumes.sharedHome.nfsPermissionFixer.mountPath }}
+{{- printf "(chgrp %s %s; chmod g+w %s)" .Values.confluence.securityContext.gid .Values.volumes.sharedHome.nfsPermissionFixer.mountPath .Values.volumes.sharedHome.nfsPermissionFixer.mountPath }}
 {{- end }}
 {{- end }}
 
