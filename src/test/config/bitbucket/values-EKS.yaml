@@ -16,10 +16,10 @@ volumes:
       create: true
       nfs:
         path: "/srv/nfs"
-    persistentVolumeClaim:
-      create: true
-      storageClassName: ""
-      volumeName: ${helm.release.prefix}-bitbucket-shared-home-pv
+      persistentVolumeClaim:
+        create: true
+        storageClassName: "efs-sc"
+        claimName: ${shared.pvc.name} # Pre-provisioned, and shared by all of our pods
 
 nodeSelector:
   node_purpose: ci
