@@ -119,7 +119,7 @@ The command that should be run by the nfs-fixer init container to correct the pe
 {{- if .Values.volumes.sharedHome.nfsPermissionFixer.command }}
 {{ .Values.volumes.sharedHome.nfsPermissionFixer.command }}
 {{- else }}
-{{- printf "(chgrp %s %s; chmod g+w %s)" .Values.bitbucket.securityContext.gid .Values.volumes.sharedHome.nfsPermissionFixer.mountPath .Values.volumes.sharedHome.nfsPermissionFixer.mountPath }}
+{{- printf "(chgrp -R %s %s; chmod -R g+w %s)" .Values.bitbucket.securityContext.gid .Values.volumes.sharedHome.nfsPermissionFixer.mountPath .Values.volumes.sharedHome.nfsPermissionFixer.mountPath }}
 {{- end }}
 {{- end }}
 
@@ -138,21 +138,6 @@ For each additional library declared, generate a volume mount that injects that 
 {{- range .Values.bitbucket.additionalLibraries }}
 - name: {{ .volumeName }}
   mountPath: "/opt/atlassian/bitbucket/app/WEB-INF/lib/{{ .fileName }}"
-  {{- if .subDirectory }}
-  subPath: {{ printf "%s/%s" .subDirectory .fileName | quote }}
-  {{- else }}
-  subPath: {{ .fileName | quote }}
-  {{- end }}
-{{- end }}
-{{- end }}
-
-{{/*
-For each additional plugin declared, generate a volume mount that injects that library into the Bitbucket plugins directory
-*/}}
-{{- define "bitbucket.additionalBundledPlugins" -}}
-{{- range .Values.bitbucket.additionalBundledPlugins }}
-- name: {{ .volumeName }}
-  mountPath: "/opt/atlassian/bitbucket/app/WEB-INF/atlassian-bundled-plugins/{{ .fileName }}"
   {{- if .subDirectory }}
   subPath: {{ printf "%s/%s" .subDirectory .fileName | quote }}
   {{- else }}

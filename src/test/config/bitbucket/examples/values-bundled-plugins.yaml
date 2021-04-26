@@ -1,0 +1,38 @@
+# This file contains overrides for the Bitbucket Helm chart's values.yaml file
+
+database:
+  url: jdbc:postgresql://${helm.release.prefix}-bitbucket-pgsql:5432/bitbucket
+  driver: org.postgresql.Driver
+  credentials:
+    secretName: bitbucket-database-credentials
+
+bitbucket:
+  clustering:
+    enabled: true
+  license:
+    secretName: bitbucket-license
+  sysadminCredentials:
+    secretName: bitbucket-sysadmin-credentials
+  additionalJvmArgs:
+    - -Dfeature.getting.started.page=false
+  resources:
+    container:
+      requests:
+        memory: 3G
+  additionalBundledPlugins:
+    - volumeName: plugin-store
+      fileName: control-freak-2020.12.10.jar
+    - volumeName: plugin-store
+      fileName: bitbucket-pr-auto-unapprove-4.2.1.jar
+
+volumes:
+  additional:
+    - name: plugin-store
+      persistentVolumeClaim:
+        claimName: plugin-storage-claim #this claim needs to be pre-provisioned and plugins need to be located there
+
+
+fluentd:
+  enabled: true
+  elasticsearch:
+    hostname: elasticsearch-master
