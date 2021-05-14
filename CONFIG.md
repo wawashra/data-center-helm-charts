@@ -239,3 +239,78 @@ to the product pods.
 The Helm charts also allow you to specify `additionalLabls`, `tolerations`, 
 `nodeSelectors` and `affinities`. These are standard Kubernetes structures 
 that will be included in the pods. 
+
+## Jira indexing
+
+## Question for myself can we only use the startup and readiness probes. Readiness probe check will be a combo of :
+
+- /status
+- index health
+
+### Ticket
+https://bulldog.internal.atlassian.com/browse/DCKUBE-275
+
+Toward Jira index consistency in a Kubernetes cluster. As part of this solution an admin should be made aware of degrading index health allowing them to take action addressing the index on the appropriate pod. 
+
+A pod exhibiting index degradation should not be restarted.
+
+1. Post Jira create a secret for the admin username and password
+2. If present, the secret will be used by new pods joining the cluster to query the index health using this endpoint `/rest/indexanalyzer/1/state?maxResults=1`
+3. The startup probes default configuration is opinioated based on Atlassian best practices. It can however be configured to perform a different probe check or even turned on off completely
+
+
+Mechanism:
+
+1. Startup probe checks `/status` endpoint 
+2. If `200` startup probe completes 
+3. If secret containing admin credentials has been created then readiness probe (confirm index is good) kicks in - readiness probe checks health of jira node by intermittintly checking index health and `/status`. If health degrades or `/status` goes bad traffic stops being sent to pod
+3. Readiness probe checks pod again if successful traffic is once again routed to pod   
+
+Points of note:
+
+* Note: Readiness probes runs on the container during its whole lifecycle.
+
+https://cloud.google.com/blog/products/containers-kubernetes/kubernetes-best-practices-setting-up-health-checks-with-readiness-and-liveness-probes
+https://stackoverflow.com/questions/45647825/how-to-define-a-liveness-command
+
+![probes](./docs/images/probes.png "Probes and Jira")
+
+
+### Python script to deduce index health
+
+```python
+#!/usr/bin/env python3
+import logging
+import requests
+import sys
+
+JIRA_INDEX = "/rest/indexanalyzer/1/state?maxResults=1"
+JIRA_STATUS = "/status"
+
+# Not validated
+base_url = sys.argv[1]
+username = sys.argv[2]
+password = sys.argv[3]
+lower_limit = int(sys.argv[4])
+upper_limit = int(sys.argv[5])
+
+session = requests.Session()
+session.auth = (username, password)
+
+jira_status = session.get(base_url + JIRA_STATUS)
+jira_index_state = session.get(base_url + JIRA_INDEX)
+
+logging.info('Kubernetes probe')
+
+if not jira_status.ok:
+    jira_status.raise_for_status()
+else:
+    index_health = int(jira_index_state.json()["index_health"])
+    if lower_limit <= index_health <= upper_limit:
+        print("match")
+        exit(0)
+    else:
+        print("no match")
+        exit(1)
+
+```

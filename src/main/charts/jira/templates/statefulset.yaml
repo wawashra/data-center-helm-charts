@@ -104,13 +104,24 @@ spec:
             - name: ehcacheobject
               containerPort: {{ .Values.jira.ports.ehcacheobject }}
               protocol: TCP
-          readinessProbe:
+          startupProbe:
             httpGet:
               port: {{ .Values.jira.ports.http }}
               path: {{ .Values.jira.service.contextPath }}/status
             initialDelaySeconds: {{ .Values.jira.readinessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.jira.readinessProbe.periodSeconds }}
             failureThreshold: {{ .Values.jira.readinessProbe.failureThreshold }}
+          {{- $adminSecretSet := (lookup "v1" "Secret" .Release.Namespace .Values.jira.service.adminSecret) }}
+          {{- if $adminSecretSet }}  
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - /tmp/index-check.sh
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 5
+          {{- end }}
           {{- with .Values.jira.resources.container }}
           resources:
             {{- toYaml . | nindent 12 }}

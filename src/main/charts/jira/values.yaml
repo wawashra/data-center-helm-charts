@@ -50,6 +50,7 @@ jira:
     contextPath:
   # -- Enable or disable security context in StatefulSet template spec. Enabled by default with UID 2001.
   # -- Disable when deploying to OpenShift, unless anyuid policy is attached to a service account
+    adminSecret: "jira-admin-secret"
   securityContext:
     enabled: true
     # -- The GID used by the Jira docker image
