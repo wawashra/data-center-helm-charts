@@ -279,10 +279,12 @@ https://stackoverflow.com/questions/45647825/how-to-define-a-liveness-command
 ### Python script to deduce index health
 
 ```python
-#!/usr/bin/env python3
-import logging
-import requests
-import sys
+#!/usr/bin/python3 -B
+
+# Utilized by our Jira Helm charts via startup and readiness probes
+# to understand the current state of a Jira pod.
+
+import requests, sys
 
 JIRA_INDEX = "/rest/indexanalyzer/1/state?maxResults=1"
 JIRA_STATUS = "/status"
@@ -294,23 +296,33 @@ password = sys.argv[3]
 lower_limit = int(sys.argv[4])
 upper_limit = int(sys.argv[5])
 
+print(f'Supplied parameters:')
+print(f'base_url:       [{base_url}]')
+print(f'username:       [{username}]')
+print(f'password:       [{password}]')
+print(f'lower_limit:    [{lower_limit}]')
+print(f'upper_limit:    [{upper_limit}]')
+print('\n')
+
 session = requests.Session()
 session.auth = (username, password)
 
 jira_status = session.get(base_url + JIRA_STATUS)
 jira_index_state = session.get(base_url + JIRA_INDEX)
 
-logging.info('Kubernetes probe')
+print('k8s Jira health probe called. Checking state of pod...')
 
 if not jira_status.ok:
+    print('Jira service is not OK/200', file=sys.stderr)
     jira_status.raise_for_status()
 else:
-    index_health = int(jira_index_state.json()["index_health"])
+    index_health = int(jira_index_state.json()["indexHealth"])
     if lower_limit <= index_health <= upper_limit:
-        print("match")
+        print(f'Jira index health within acceptable bounds [{lower_limit} - {upper_limit}]')
         exit(0)
     else:
-        print("no match")
+        print(f'Jira index health not within acceptable bounds: lower_limit[{lower_limit}] <= current index health[{index_health}] <= upper_limit[{upper_limit}]', file=sys.stderr)
         exit(1)
+
 
 ```
