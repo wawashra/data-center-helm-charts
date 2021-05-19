@@ -38,7 +38,7 @@ database:
   type: mysql
   # -- The JDBC URL of the database to be used by Confluence and Synchrony, e.g. jdbc:postgresql://host:port/database
   # If not specified, then it will need to be provided via browser during initial startup.
-  url: jdbc:mysql://dcdmy.cys9vcmootvs.ap-southeast-2.rds.amazonaws.com:3306/abrokes_blitz_confluence?useSSL=false&amp;sessionVariables=transaction_isolation='READ-COMMITTED'
+  url: jdbc:mysql://common-confluence-mysql.blitz.svc.cluster.local:3306/confluence_common?useSSL=false&amp;sessionVariables=transaction_isolation='READ-COMMITTED'
   credentials:
     # -- The name of the Kubernetes Secret that contains the database login credentials.
     # If specified, then the credentials will be automatically populated during Confluence setup.
@@ -190,7 +190,7 @@ synchrony:
   # This will be the URL that users' browsers will be given to communicate with Synchrony, as well as the URL that the
   # Confluence service will use to communicate directly with Synchrony, so the URL must be resovable both from inside and
   # outside the Kubernetes cluster.
-  ingressUrl: https://confluence-blitz-basic.kube.deplops.com/synchrony
+  ingressUrl: https://confluence-blitz-common.kube.deplops.com/synchrony
 
 ingress:
   # -- True if an Ingress Resource should be created.
@@ -206,7 +206,7 @@ ingress:
   # https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/#custom-max-body-size
   maxBodySize: 10m
   # -- The fully-qualified hostname of the Ingress Resource.
-  host: confluence-blitz-basic.kube.deplops.com
+  host: confluence-blitz-common.kube.deplops.com
   # -- The custom annotations that should be applied to the Ingress
   # Resource when not using the Kubernetes ingress-nginx controller.
   annotations: { }
@@ -291,7 +291,7 @@ volumes:
     # -- Specifies the path in the Confluence container to which the shared-home volume will be mounted.
     mountPath: "/var/atlassian/application-data/shared-home"
     # -- Specifies the sub-directory of the shared-home volume which will be mounted in to the Confluence container.
-    subPath: confluence-basic-blitz
+    subPath: confluence-blitz-common
     nfsPermissionFixer:
       # -- If enabled, this will alter the shared-home volume's root directory so that Confluence can write to it.
       # This is a workaround for a Kubernetes bug affecting NFS volumes: https://github.com/kubernetes/examples/issues/260
