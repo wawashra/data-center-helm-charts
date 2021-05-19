@@ -38,7 +38,7 @@ database:
   type: mysql
   # -- The JDBC URL of the database to be used by Confluence and Synchrony, e.g. jdbc:postgresql://host:port/database
   # If not specified, then it will need to be provided via browser during initial startup.
-  url: jdbc:mysql://common-confluence-mysql.blitz.svc.cluster.local:3306/confluence_common?useSSL=false&amp;sessionVariables=transaction_isolation='READ-COMMITTED'
+  url: jdbc:mysql://common-confluence-mysql.blitz.svc.cluster.local:3306/confluence_common
   credentials:
     # -- The name of the Kubernetes Secret that contains the database login credentials.
     # If specified, then the credentials will be automatically populated during Confluence setup.
