@@ -27,4 +27,4 @@ spec:
     - name: shared-home-nfs
       nfs:
         path: /srv/nfs
-        server:  # this needs to be provided manually
+        server: 10.100.90.230
