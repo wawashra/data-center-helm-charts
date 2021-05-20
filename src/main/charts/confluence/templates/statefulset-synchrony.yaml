@@ -32,7 +32,6 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["/scripts/start-synchrony.sh"]
           volumeMounts:
-            {{- include "confluence.additionalLibraries" . | nindent 12 }}
             - mountPath: /scripts
               name: entrypoint-script
           ports:
@@ -75,5 +74,4 @@ spec:
           configMap:
             name: {{ include "synchrony.fullname" . }}-entrypoint
             defaultMode: 0744
-        {{ include "confluence.volumes.sharedHome" . | nindent 8 }}
 {{ end }}
