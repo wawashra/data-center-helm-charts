@@ -64,7 +64,7 @@ jira:
     # -- The initial delay (in seconds) for the Jira container readiness probe, after which the probe will start running
     initialDelaySeconds: 10
     # -- How often (in seconds) the Jira container readiness probe will run
-    periodSeconds: 5
+    periodSeconds: 20
     # -- The number of consecutive failures of the Jira container readiness probe before the pod fails readiness checks
     failureThreshold: 30
 
