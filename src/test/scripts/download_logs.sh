@@ -9,6 +9,15 @@ PRODUCT_RELEASE_NAME=$RELEASE_PREFIX-$PRODUCT_NAME
 
 mkdir -p "$LOG_DOWNLOAD_DIR"
 
+getThreadDump() {
+    local podName=$1
+
+    echo "Generating a thread dump from $podName"
+
+    local pid=$(kubectl -n ${TARGET_NAMESPACE} exec ${podName} -- jps -l | grep 'org.apache.catalina.startup.Bootstrap' | awk '{print $1}')
+    kubectl -n ${TARGET_NAMESPACE} exec ${podName} -- su jira -c "jstack $pid" > "$LOG_DOWNLOAD_DIR/${podName}.dump"
+}
+
 getPodLogs() {
     local releaseName=$1
 
@@ -21,6 +30,7 @@ getPodLogs() {
       for container in $containers; do
         kubectl -n "${TARGET_NAMESPACE}" logs --container="$container" "$podName" > "$LOG_DOWNLOAD_DIR/${podName}--${container}.log"
       done
+      getThreadDump $podName
     done
 }
 
