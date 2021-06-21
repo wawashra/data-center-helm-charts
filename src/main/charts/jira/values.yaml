@@ -635,14 +635,12 @@ additionalInitContainers: []
 additionalLabels: {}
 #  name: <value>
 
-## Additional existing ConfigMaps and Secrets not managed by Helm that should be 
-## mounted into service container. Configuration details below (camelCase is important!):
-  # 'name'      - References existing ConfigMap or secret name.
-  # 'type'      - 'configMap' or 'secret'
-  # 'key'       - The file name.
-  # 'mountPath' - The destination directory in a container.
-## VolumeMount and Volumes are added with this name and index position, for example; 
-## custom-config-0, keystore-2
+# -- Additional existing ConfigMaps and Secrets not managed by Helm that should be mounted into server container
+# configMap and secret are two available types (camelCase is important!)
+# mountPath is a destination directory in a container and key is file name
+# name references existing ConfigMap or secret name. VolumeMount and Volumes are added with this name and index position,
+# for example, custom-config-0, keystore-2
+#
 additionalFiles: []
 #  - name: custom-config
 #    type: configMap
