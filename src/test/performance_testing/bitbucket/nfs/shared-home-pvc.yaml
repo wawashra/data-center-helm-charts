@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  namespace: bitbucket
+  name: bitbucket-shared-home
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: ""
+  volumeMode: Filesystem
+  volumeName: bitbucket-shared-home
+  resources:
+    requests:
+      storage: 1000Gi
