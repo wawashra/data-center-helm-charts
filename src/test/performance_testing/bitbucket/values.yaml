@@ -520,7 +520,7 @@ bitbucket:
     # -- Set to 'true' if Data Center clustering should be enabled
     # This will automatically configure cluster peer discovery between cluster nodes.
     #
-    enabled: false
+    enabled: true
 
   # Elasiticsearch config
   # 
@@ -599,7 +599,7 @@ bitbucket:
     # for 'container.requests.cpu'.
     # https://docs.oracle.com/en/java/javase/11/tools/java.html#GUID-3B1CE181-CD30-4178-9602-230B800D4FAE
     #
-    - -XX:ActiveProcessorCount=2
+    - -XX:ActiveProcessorCount=4
   
   # -- Specifies a list of additional Java libraries that should be added to the 
   # Bitbucket container. Each item in the list should specify the name of the volume 
