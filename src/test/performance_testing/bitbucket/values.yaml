@@ -249,7 +249,7 @@ volumes:
         # -- The address of the NFS server. It needs to be resolveable by the kubelet, 
         # so consider using an IP address.
         #
-        server: "192.168.93.52"
+        server: "192.168.71.85"
         
         # -- Specifies the path exported by the NFS server, used in the mount command
         #
@@ -581,11 +581,11 @@ bitbucket:
         
         # -- Initial CPU request by Bitbucket pod
         #
-        cpu: "4" # -- If changing the cpu value update additional JVM arg 'ActiveProcessorCount' below
+        cpu: "7" # -- If changing the cpu value update additional JVM arg 'ActiveProcessorCount' below
         
         # -- Initial Memory request by Bitbucket pod
         #
-        memory: "16G"
+        memory: "15G"
       #  limits:
       #    cpu: "2"
       #    memory: "2G"
@@ -700,7 +700,7 @@ podAnnotations: {}
 
 # -- Standard K8s node-selectors that will be applied to all Bitbucket pods
 #
-nodeSelector: {}
+nodeSelector: 
 #  name: <value>
 
 # -- Standard K8s tolerations that will be applied to all Bitbucket pods
@@ -729,8 +729,27 @@ tolerations: []
 #              values:
 #                - nfs-server # needs to be the same value as NFS server deployment
 #        topologyKey: topology.kubernetes.io/zone
-affinity: {}
-
+affinity: 
+ nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: eks.amazonaws.com/nodegroup
+            operator: In
+            values:
+            - bonnie
+#   nodeAffinity:
+#    requiredDuringSchedulingIgnoredDuringExecution:
+#      - labelSelector:
+#          matchExpressions:
+#            - key: eks.amazonaws.com/nodegroup
+#              operator: In
+#              values:
+#                - bonnie      
+#            - key: beta.kubernetes.io/instance-type
+#              operator: In
+#              values:
+#                - c5.2xlarge   
 # -- Additional container definitions that will be added to all Bitbucket pods
 #
 additionalContainers: []
