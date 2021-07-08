@@ -461,7 +461,7 @@ jira:
       
       # -- The maximum amount of heap memory that will be used by the Jira JVM
       #
-      maxHeap: "15g"
+      maxHeap: "16g"
       
       # -- The minimum amount of heap memory that will be used by the Jira JVM
       #
@@ -483,7 +483,7 @@ jira:
       
         # -- Initial CPU request by Jira pod
         #
-        cpu: "14" # If changing the cpu value update 'ActiveProcessorCount' below
+        cpu: "15" # If changing the cpu value update 'ActiveProcessorCount' below
         
         # -- Initial Memory request by Jira pod
         #
