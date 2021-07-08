@@ -3,7 +3,9 @@
 > NOTE: Ensure the pre-requisite infrastructure is available and ready
 > * RDS instance 
 > * EBS volume
-> * ELK stack
+> * Elasticsearch stack
+
+## Deploy
 
 1. Deploy the NFS server by using the manifests in the [nfs](nfs) directory
 2. Test NFS by using the [busybox](busybox) server
