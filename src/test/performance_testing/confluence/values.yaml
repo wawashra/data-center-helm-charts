@@ -34,7 +34,7 @@ image:
   # -- The Confluence Docker image to use
   # https://hub.docker.com/r/atlassian/confluence-server
   #
-  repository: "docker.atl-paas.net/atlassian/confluence-server"
+  repository: "atlassian/confluence-server"
   
   # -- Image pull policy
   #
@@ -42,7 +42,7 @@ image:
   
   # -- The docker image tag to be used - defaults to the Chart appVersion
   #
-  tag: "CONFA3CLUSTER-K8S35-1"
+  tag: ""
 
 # K8s ServiceAccount configuration. Give fine-grained identity and authorization 
 # to Pods
@@ -305,7 +305,7 @@ ingress:
   # -- Set to 'true' if an Ingress Resource should be created. This depends on a 
   # pre-provisioned Ingress Controller being available.
   # 
-  create: false
+  create: true
   
   # -- Set to 'true' if the Ingress Resource is to use the K8s 'ingress-nginx' 
   # controller. 
@@ -672,7 +672,7 @@ synchrony:
   # be given to communicate with Synchrony, as well as the URL that the Confluence service 
   # will use to communicate directly with Synchrony, so the URL must be resovable both from 
   # inside and outside the Kubernetes cluster.
-  ingressUrl:
+  ingressUrl: "https://confluence-perf.k8s.deplops.com"
   
   # -- Specifies a list of additional Java libraries that should be added to the 
   # Synchrony container. Each item in the list should specify the name of the volume 
