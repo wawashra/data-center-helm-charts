@@ -43,7 +43,7 @@ image:
   
   # -- The docker image tag to be used - defaults to the Chart appVersion
   #
-  tag: ""
+  tag: "8.13.0"
   
 # K8s ServiceAccount configuration. Give fine-grained identity and authorization 
 # to Pods
@@ -502,6 +502,7 @@ jira:
     # https://docs.oracle.com/en/java/javase/11/tools/java.html#GUID-3B1CE181-CD30-4178-9602-230B800D4FAE
     #
     - -XX:ActiveProcessorCount=15
+    - -Djira.downgrade.allowed=true
 
   # -- Specifies a list of additional Java libraries that should be added to the 
   # Jira container. Each item in the list should specify the name of the volume 
