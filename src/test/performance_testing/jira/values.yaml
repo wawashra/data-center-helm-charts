@@ -161,19 +161,19 @@ volumes:
       # -- If 'true', then a 'PersistentVolume' and 'PersistentVolumeClaim' will be dynamically 
       # created for each pod based on the 'StorageClassName' supplied below.
       #          
-      create: false
+      create: true
       
       # -- Specify the name of the 'StorageClass' that should be used for the local-home 
       # volume claim.
       #
-      storageClassName:
+      storageClassName: "local-home"
       
       # -- Specifies the standard K8s resource requests and/or limits for the local-home 
       # volume claims.
       #
       resources:
         requests:
-          storage: 1Gi
+          storage: 500Gi
           
     # -- Static provisioning of local-home using K8s PVs and PVCs
     #
