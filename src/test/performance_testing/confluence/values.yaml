@@ -127,7 +127,7 @@ database:
    # - 'jdbc:oracle:thin:@<dbhost>:1521:<SID>'
   # https://github.com/atlassian-labs/data-center-helm-charts/blob/master/docs/CONFIGURATION.md#databasejdbcurl
   #
-  url: "confluence-k8s-test-empty.cvuoodawotyo.ap-southeast-2.rds.amazonaws.com"
+  url: "jdbc:postgresql://confluence-perf-large.cvuoodawotyo.ap-southeast-2.rds.amazonaws.com:5432/postgres"
   
   # JDBC connection credentials
   # 
@@ -191,7 +191,7 @@ volumes:
       #
       resources:
         requests:
-          storage: 1Gi
+          storage: 200Gi
           
     # -- Static provisioning of local-home using K8s PVs and PVCs
     #
@@ -234,7 +234,7 @@ volumes:
       # -- Specify the name of the 'StorageClass' that should be used for the 'shared-home' 
       # volume claim.
       #
-      storageClassName:
+      storageClassName: 
       
       # -- Specifies the standard K8s resource requests and/or limits for the shared-home 
       # volume claims.
@@ -252,7 +252,10 @@ volumes:
     # https://kubernetes.io/docs/concepts/storage/persistent-volumes/#static
     # https://github.com/atlassian-labs/data-center-helm-charts/blob/master/docs/examples/storage/aws/SHARED_STORAGE.md
     #
-    customVolume: {}
+    customVolume: 
+      persistentVolumeClaim:
+        claimName: "confluence-shared-home" 
+
     # persistentVolumeClaim:
     #   claimName: "<pvc>"
     
@@ -338,7 +341,9 @@ ingress:
   # -- The custom annotations that should be applied to the Ingress Resource 
   # when NOT using the K8s ingress-nginx controller.
   #
-  annotations: {}
+  annotations: 
+    cert-manager.io/issuer: "letsencrypt-prod" # Using https://letsencrypt.org/
+
   
   # -- Set to 'true' if browser communication with the application should be TLS 
   # (HTTPS) enforced.
@@ -354,7 +359,7 @@ ingress:
   # https://kubernetes.io/docs/concepts/configuration/secret/#tls-secrets
   # https://kubernetes.io/docs/concepts/services-networking/ingress/#tls
   #
-  tlsSecretName:
+  tlsSecretName: tls-certificate
 
 # Confluence configuration 
 #
@@ -476,7 +481,7 @@ confluence:
     # -- Set to 'true' if Data Center clustering should be enabled
     # This will automatically configure cluster peer discovery between cluster nodes.
     #
-    enabled: false
+    enabled: true
     
     # -- Set to 'true' if the K8s pod name should be used as the end-user-visible 
     # name of the Data Center cluster node.

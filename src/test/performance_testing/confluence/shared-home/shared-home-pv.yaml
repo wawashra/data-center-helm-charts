@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: confluence-shared-home
+spec:
+  capacity:
+    storage: 1000Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  storageClassName: confluence-shared-home
+  persistentVolumeReclaimPolicy: Retain
+  mountOptions:
+    - rw
+    - lookupcache=pos
+    - noatime
+    - intr
+    - _netdev
+  csi:
+    driver: efs.csi.aws.com
+    volumeHandle: fs-4f97ac77
