@@ -529,7 +529,7 @@ bitbucket:
     # -- The base URL of the external Elasticsearch instance to be used. If this is defined,
     # then Bitbucket will disable its internal Elasticsearch instance.
     #
-    baseUrl:
+    baseUrl: "https://vpc-bonnie-perf-k8s-2-jbt5mcqzhi2rpww2lmb7kaeyam.ap-southeast-2.es.amazonaws.com"
     
     # Elasticsearch connection details
     #
@@ -541,7 +541,7 @@ bitbucket:
       # --from-literal=password=<password>'
       # https://kubernetes.io/docs/concepts/configuration/secret/#opaque-secrets
       #
-      secretName:
+      secretName: "elasticsearch-creds"
       
       # -- The key in the the Kubernetes Secret that contains the Elasticsearch username.
       #
