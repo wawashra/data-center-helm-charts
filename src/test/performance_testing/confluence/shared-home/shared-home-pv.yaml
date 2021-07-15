@@ -18,4 +18,4 @@ spec:
     - _netdev
   csi:
     driver: efs.csi.aws.com
-    volumeHandle: fs-808386b8
+    volumeHandle: fs-bc919484
