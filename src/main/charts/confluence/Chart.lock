@@ -1,0 +1,6 @@
+dependencies:
+- name: common
+  repository: https://charts.helm.sh/incubator/
+  version: 0.0.5
+digest: sha256:0a70d3ab269c66dee51a272c0f6462a313d2d4fdbb10cb22e8eeff979fcdbbbc
+generated: "2021-05-13T10:09:49.736264+10:00"
