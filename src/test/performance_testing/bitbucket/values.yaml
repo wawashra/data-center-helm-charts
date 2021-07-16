@@ -531,7 +531,7 @@ bitbucket:
     # -- The base URL of the external Elasticsearch instance to be used. If this is defined,
     # then Bitbucket will disable its internal Elasticsearch instance.
     #
-    baseUrl: "https://vpc-bonnie-perf-k8s-2-jbt5mcqzhi2rpww2lmb7kaeyam.ap-southeast-2.es.amazonaws.com"
+    baseUrl: "https://vpc-bonnie-perf-k8s-4-i6hwv7vfrf4bp55cep2jq2pkxu.ap-southeast-2.es.amazonaws.com"
     
     # Elasticsearch connection details
     #
