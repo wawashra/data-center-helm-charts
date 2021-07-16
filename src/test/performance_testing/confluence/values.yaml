@@ -277,7 +277,7 @@ volumes:
       # can write to it. This is a workaround for a K8s bug affecting NFS volumes: 
       # https://github.com/kubernetes/examples/issues/260
       #
-      enabled: false
+      enabled: true
       
       # -- The path in the K8s initContainer where the shared-home volume will be mounted
       #
@@ -591,7 +591,7 @@ synchrony:
   # -- Set to 'true' if Synchrony (i.e. collaborative editing) should be enabled.
   # This will result in a separate StatefulSet and Service to be created for Synchrony.
   # If disabled, then collaborative editing will be disabled in Confluence.
-  enabled: false
+  enabled: true
   
   # K8s Synchrony Service configuration
   #
@@ -677,7 +677,7 @@ synchrony:
   # be given to communicate with Synchrony, as well as the URL that the Confluence service 
   # will use to communicate directly with Synchrony, so the URL must be resovable both from 
   # inside and outside the Kubernetes cluster.
-  ingressUrl: "https://confluence-perf.k8s.deplops.com"
+  ingressUrl: "https://confluence-perf.k8s.deplops.com/synchrony"
   
   # -- Specifies a list of additional Java libraries that should be added to the 
   # Synchrony container. Each item in the list should specify the name of the volume 
