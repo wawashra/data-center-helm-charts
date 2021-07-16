@@ -11,8 +11,8 @@ spec:
     command: ["/bin/sleep", "3650d"]
     resources:
       limits:
-        memory: "1G"
-        cpu: "500m"
+        memory: "8G"
+        cpu: "4"
     volumeMounts:
       - mountPath: /shared-home
         name: shared-home
@@ -20,3 +20,12 @@ spec:
     - name: shared-home
       persistentVolumeClaim:
         claimName: confluence-shared-home
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: eks.amazonaws.com/nodegroup
+            operator: In
+            values:
+            - connie
