@@ -127,7 +127,7 @@ database:
    # - 'jdbc:oracle:thin:@<dbhost>:1521:<SID>'
   # https://github.com/atlassian-labs/data-center-helm-charts/blob/master/docs/CONFIGURATION.md#databasejdbcurl
   #
-  url: "jdbc:postgresql://confluence-perf-large.cvuoodawotyo.ap-southeast-2.rds.amazonaws.com:5432/postgres" ????
+  url: "jdbc:postgresql://confluence-perf-large.cvuoodawotyo.ap-southeast-2.rds.amazonaws.com:5432/postgres"
   
   # JDBC connection credentials
   # 
@@ -191,7 +191,7 @@ volumes:
       #
       resources:
         requests:
-          storage: 200Gi
+          storage: 500Gi
           
     # -- Static provisioning of local-home using K8s PVs and PVCs
     #
