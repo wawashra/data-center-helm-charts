@@ -251,7 +251,7 @@ volumes:
         # -- The address of the NFS server. It needs to be resolveable by the kubelet, 
         # so consider using an IP address.
         #
-        server: "192.168.71.85"
+        server: "192.168.85.28"
         
         # -- Specifies the path exported by the NFS server, used in the mount command
         #
@@ -739,7 +739,7 @@ affinity:
           - key: eks.amazonaws.com/nodegroup
             operator: In
             values:
-            - bonnie
+            - bitbucket2
 
 #
 additionalContainers: []

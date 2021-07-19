@@ -1,0 +1,17 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: perf-test-k8s
+  region: ap-southeast-2
+
+nodeGroups:
+  - name: bitbucket2
+    labels: { role: bitbucket2, nodegroup: bitbucket2 }
+    instanceType: c5.2xlarge
+    desiredCapacity: 2
+    availabilityZones: ["ap-southeast-2b"]
+    volumeSize: 500
+    privateNetworking: false
+    amiFamily: AmazonLinux2
+
