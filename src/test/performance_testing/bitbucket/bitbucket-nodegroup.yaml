@@ -5,13 +5,15 @@ metadata:
   name: perf-test-k8s
   region: ap-southeast-2
 
-nodeGroups:
-  - name: bitbucket2
-    labels: { role: bitbucket2, nodegroup: bitbucket2 }
+managedNodeGroups:
+  - name: bitbucket3
+    labels: { role: bitbucket3 }
+    tags:
+      nodegroup-role: bitbucket3
     instanceType: c5.2xlarge
     desiredCapacity: 2
     availabilityZones: ["ap-southeast-2b"]
     volumeSize: 500
     privateNetworking: false
-    amiFamily: AmazonLinux2
+    #amiFamily: AmazonLinux2
 

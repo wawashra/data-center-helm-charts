@@ -24,7 +24,7 @@ spec:
                   - key: eks.amazonaws.com/nodegroup
                     operator: In
                     values:
-                      - bitbucket2
+                      - bitbucket3
       containers:
         - name: bitbucket-nfs-server
           image: atlassian/nfs-server-test:latest # this is just a testing image not recommended for any other use case
@@ -48,8 +48,8 @@ spec:
               mountPath: /etc/exports.d/
           resources:
             requests:
-              cpu: 1000m
-              memory: 512Mi
+              cpu: "7"
+              memory: "15G"
       terminationGracePeriodSeconds: 60
       volumes:
         - name: bitbucket-shared-home
