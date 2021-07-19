@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: confluence-shared-home
+  name: confluence-xlarge-shared-home
 spec:
   accessModes:
     - ReadWriteMany
-  storageClassName: confluence-shared-home
+  storageClassName: confluence-xlarge-shared-home
   volumeMode: Filesystem
-  volumeName: confluence-shared-home
+  volumeName: confluence-xlarge-shared-home
   resources:
     requests:
       storage: 1000Gi

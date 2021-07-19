@@ -252,9 +252,9 @@ volumes:
     # https://kubernetes.io/docs/concepts/storage/persistent-volumes/#static
     # https://github.com/atlassian-labs/data-center-helm-charts/blob/master/docs/examples/storage/aws/SHARED_STORAGE.md
     #
-    customVolume: {}
-#      persistentVolumeClaim:
-#        claimName: "confluence-shared-home" 
+    customVolume: 
+      persistentVolumeClaim:
+        claimName: "confluence-xlarge-shared-home" 
 
     # persistentVolumeClaim:
     #   claimName: "<pvc>"

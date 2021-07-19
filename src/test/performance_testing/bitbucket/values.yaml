@@ -52,7 +52,7 @@ image:
   
   # -- The docker image tag to be used - defaults to the Chart appVersion
   #
-  tag: "7.11.1"
+  tag: ""
 
 # K8s ServiceAccount configuration. Give fine-grained identity and authorization 
 # to Pods
