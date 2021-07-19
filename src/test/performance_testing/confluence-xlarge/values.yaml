@@ -341,14 +341,13 @@ ingress:
   # -- The custom annotations that should be applied to the Ingress Resource 
   # when NOT using the K8s ingress-nginx controller.
   #
-  annotations: 
-    cert-manager.io/issuer: "letsencrypt-prod" # Using https://letsencrypt.org/
+  annotations: {}
 
   
   # -- Set to 'true' if browser communication with the application should be TLS 
   # (HTTPS) enforced.
   #
-  https: true
+  https: false
   
   # -- The name of the K8s Secret that contains the TLS private key and corresponding 
   # certificate. When utilised, TLS termination occurs at the ingress point where 
@@ -359,7 +358,7 @@ ingress:
   # https://kubernetes.io/docs/concepts/configuration/secret/#tls-secrets
   # https://kubernetes.io/docs/concepts/services-networking/ingress/#tls
   #
-  tlsSecretName: tls-certificate
+  tlsSecretName: 
 
 # Confluence configuration 
 #
@@ -521,11 +520,11 @@ confluence:
       requests:
         # -- Initial CPU request by Confluence pod
         #
-        cpu: "15" # -- If changing the cpu value update additional JVM arg 'ActiveProcessorCount' below
+        cpu: "14" # -- If changing the cpu value update additional JVM arg 'ActiveProcessorCount' below
         
         # -- Initial Memory request by Confluence pod
         #
-        memory: "29G"
+        memory: "27G"
       #  limits:
       #    cpu: "2"
       #    memory: "2G"
@@ -591,7 +590,7 @@ synchrony:
   # -- Set to 'true' if Synchrony (i.e. collaborative editing) should be enabled.
   # This will result in a separate StatefulSet and Service to be created for Synchrony.
   # If disabled, then collaborative editing will be disabled in Confluence.
-  enabled: false
+  enabled: true
   
   # K8s Synchrony Service configuration
   #
@@ -667,17 +666,17 @@ synchrony:
       requests:
         # -- Initial CPU request by Synchrony pod
         #
-        cpu: "2"
+        cpu: "1"
         
         # -- Initial Memory request Synchrony pod
         #
-        memory: "2.5G"
+        memory: "2G"
         
   # -- The base URL of the Synchrony service. This will be the URL that users' browsers will 
   # be given to communicate with Synchrony, as well as the URL that the Confluence service 
   # will use to communicate directly with Synchrony, so the URL must be resovable both from 
   # inside and outside the Kubernetes cluster.
-  ingressUrl: "https://confluence-xl-perf.k8s.deplops.com"
+  ingressUrl: "https://confluence-xl-perf.k8s.deplops.com/synchrony" 
   
   # -- Specifies a list of additional Java libraries that should be added to the 
   # Synchrony container. Each item in the list should specify the name of the volume 
