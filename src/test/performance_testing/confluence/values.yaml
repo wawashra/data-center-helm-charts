@@ -127,7 +127,7 @@ database:
    # - 'jdbc:oracle:thin:@<dbhost>:1521:<SID>'
   # https://github.com/atlassian-labs/data-center-helm-charts/blob/master/docs/CONFIGURATION.md#databasejdbcurl
   #
-  url: "jdbc:postgresql://confluence-perf-large.cvuoodawotyo.ap-southeast-2.rds.amazonaws.com:5432/postgres"
+  url: "jdbc:postgresql://confluence-perf-large.cvuoodawotyo.ap-southeast-2.rds.amazonaws.com:5432/postgres" ????
   
   # JDBC connection credentials
   # 
@@ -184,7 +184,7 @@ volumes:
       # -- Specify the name of the 'StorageClass' that should be used for the local-home 
       # volume claim.
       #
-      storageClassName:
+      storageClassName: "local-home"
       
       # -- Specifies the standard K8s resource requests and/or limits for the local-home 
       # volume claims.

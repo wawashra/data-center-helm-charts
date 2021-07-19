@@ -740,19 +740,7 @@ affinity:
             operator: In
             values:
             - bonnie
-#   nodeAffinity:
-#    requiredDuringSchedulingIgnoredDuringExecution:
-#      - labelSelector:
-#          matchExpressions:
-#            - key: eks.amazonaws.com/nodegroup
-#              operator: In
-#              values:
-#                - bonnie      
-#            - key: beta.kubernetes.io/instance-type
-#              operator: In
-#              values:
-#                - c5.2xlarge   
-# -- Additional container definitions that will be added to all Bitbucket pods
+
 #
 additionalContainers: []
 #  - name: <name>
