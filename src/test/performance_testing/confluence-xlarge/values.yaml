@@ -676,7 +676,7 @@ synchrony:
   # be given to communicate with Synchrony, as well as the URL that the Confluence service 
   # will use to communicate directly with Synchrony, so the URL must be resovable both from 
   # inside and outside the Kubernetes cluster.
-  ingressUrl: "https://confluence-xl-perf.k8s.deplops.com/synchrony" 
+  ingressUrl: "http://confluence-xl-perf.k8s.deplops.com/synchrony" 
   
   # -- Specifies a list of additional Java libraries that should be added to the 
   # Synchrony container. Each item in the list should specify the name of the volume 
