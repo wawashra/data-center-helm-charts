@@ -521,7 +521,7 @@ confluence:
       requests:
         # -- Initial CPU request by Confluence pod
         #
-        cpu: "7" # -- If changing the cpu value update additional JVM arg 'ActiveProcessorCount' below
+        cpu: "7.9" # -- If changing the cpu value update additional JVM arg 'ActiveProcessorCount' below
         
         # -- Initial Memory request by Confluence pod
         #
@@ -539,7 +539,7 @@ confluence:
     # for 'container.requests.cpu'.
     # https://docs.oracle.com/en/java/javase/11/tools/java.html#GUID-3B1CE181-CD30-4178-9602-230B800D4FAE
     #
-    - -XX:ActiveProcessorCount=7
+    - -XX:ActiveProcessorCount=8
   
   # -- Specifies a list of additional Java libraries that should be added to the 
   # Confluence container. Each item in the list should specify the name of the volume 
