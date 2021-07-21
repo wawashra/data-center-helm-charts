@@ -34,7 +34,7 @@ image:
   # -- The Confluence Docker image to use
   # https://hub.docker.com/r/atlassian/confluence-server
   #
-  repository: "docker.atl-paas.net/atlassian/confluence-server"
+  repository: "atlassian/confluence-server"
   
   # -- Image pull policy
   #
@@ -42,7 +42,7 @@ image:
   
   # -- The docker image tag to be used - defaults to the Chart appVersion
   #
-  tag: "CONFA3CLUSTER-K8S35-1"
+  tag: "7.12.2-jdk11"
 
 # K8s ServiceAccount configuration. Give fine-grained identity and authorization 
 # to Pods
@@ -539,6 +539,8 @@ confluence:
     # https://docs.oracle.com/en/java/javase/11/tools/java.html#GUID-3B1CE181-CD30-4178-9602-230B800D4FAE
     #
     - -XX:ActiveProcessorCount=15
+    - -Dcom.atlassian.confluence.journal.timeToLiveInMillis=5184000000 # 2 months
+    - -Dconfluence.cluster.index.recovery.generation.timeout=5184000 # 2 months
   
   # -- Specifies a list of additional Java libraries that should be added to the 
   # Confluence container. Each item in the list should specify the name of the volume 
