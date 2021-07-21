@@ -521,7 +521,7 @@ confluence:
       requests:
         # -- Initial CPU request by Confluence pod
         #
-        cpu: "7.9" # -- If changing the cpu value update additional JVM arg 'ActiveProcessorCount' below
+        cpu: "7.8" # -- If changing the cpu value update additional JVM arg 'ActiveProcessorCount' below
         
         # -- Initial Memory request by Confluence pod
         #
