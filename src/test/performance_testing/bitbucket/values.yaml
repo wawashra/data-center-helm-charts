@@ -565,7 +565,7 @@ bitbucket:
     
       # -- The maximum amount of heap memory that will be used by the Bitbucket JVM
       # The same value will be used by the Elasticsearch JVM.
-      maxHeap: "12g"
+      maxHeap: "6g"
       
       # -- The minimum amount of heap memory that will be used by the Bitbucket JVM
       # The same value will be used by the Elasticsearch JVM.
@@ -578,19 +578,12 @@ bitbucket:
     # accommodated. Allowing for (maxHeap+codeCache)*1.5 would be an example.
     #
     container:
-    
       requests:
-        
-        # -- Initial CPU request by Bitbucket pod
-        #
-        cpu: "7" # -- If changing the cpu value update additional JVM arg 'ActiveProcessorCount' below
-        
-        # -- Initial Memory request by Bitbucket pod
-        #
-        memory: "15G"
-      #  limits:
-      #    cpu: "2"
-      #    memory: "2G"
+        cpu: "7" 
+        memory: "14550Mi"
+      limits:
+        cpu: "7"
+        memory: "14550Mi"
 
   # Specifies a list of additional arguments that can be passed to the Bitbucket JVM, e.g. 
   # system properties.
