@@ -10,4 +10,4 @@ spec:
   volumeName: confluence-xlarge-shared-home
   resources:
     requests:
-      storage: 1000Gi
+      storage: 1500Gi
