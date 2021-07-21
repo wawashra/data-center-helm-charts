@@ -480,19 +480,12 @@ jira:
     # accommodated. Allowing for (maxHeap+codeCache)*1.5 would be an example.
     #
     container:
-      
       requests:
-      
-        # -- Initial CPU request by Jira pod
-        #
         cpu: "15" # If changing the cpu value update 'ActiveProcessorCount' below
-        
-        # -- Initial Memory request by Jira pod
-        #
         memory: "29G"
-      #  limits:
-      #    cpu: "2"
-      #    memory: "2G"
+      limits:
+        cpu: "15"
+        memory: "29G"
 
   # Specifies a list of additional arguments that can be passed to the Jira JVM, e.g. 
   # system properties.
