@@ -10,6 +10,14 @@ spec:
   selector:
     matchLabels:
       {{- include "confluence.selectorLabels" . | nindent 6 }}
+  volumeClaimTemplates:
+  - metadata:
+      name: local-home
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1000Gi
   template:
     metadata:
       {{- with .Values.podAnnotations }}

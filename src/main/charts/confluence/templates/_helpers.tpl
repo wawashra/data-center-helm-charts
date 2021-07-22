@@ -294,9 +294,9 @@ For each additional plugin declared, generate a volume mount that injects that l
 {{- end }}
 
 {{- define "confluence.volumes" -}}
-{{ if not .Values.volumes.localHome.persistentVolumeClaim.create }}
-{{ include "confluence.volumes.localHome" . }}
-{{- end }}
+{{/*{{ if not .Values.volumes.localHome.persistentVolumeClaim.create }}*/}}
+{{/*{{ include "confluence.volumes.localHome" . }}*/}}
+{{/*{{- end }}*/}}
 {{ include "confluence.volumes.sharedHome" . }}
 {{- with .Values.volumes.additional }}
 {{- toYaml . | nindent 0 }}

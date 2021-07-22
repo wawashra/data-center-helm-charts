@@ -179,7 +179,7 @@ volumes:
       # -- If 'true', then a 'PersistentVolume' and 'PersistentVolumeClaim' will be dynamically 
       # created for each pod based on the 'StorageClassName' supplied below.
       #   
-      create: true
+      create: false
       
       # -- Specify the name of the 'StorageClass' that should be used for the local-home 
       # volume claim.
@@ -515,16 +515,16 @@ confluence:
     # size, the reserved code cache size, plus other JVM overheads, must be 
     # accommodated. Allowing for (maxHeap+codeCache)*1.5 would be an example.
     #
-    container: 
-    
+    container:
+
       requests:
         # -- Initial CPU request by Confluence pod
         #
-        cpu: "15.9" # -- If changing the cpu value update additional JVM arg 'ActiveProcessorCount' below
-        
+        cpu: "13" # -- If changing the cpu value update additional JVM arg 'ActiveProcessorCount' below
+
         # -- Initial Memory request by Confluence pod
         #
-        memory: "30G"
+        memory: "25G"
       #  limits:
       #    cpu: "2"
       #    memory: "2G"
