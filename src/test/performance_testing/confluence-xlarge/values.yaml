@@ -34,15 +34,15 @@ image:
   # -- The Confluence Docker image to use
   # https://hub.docker.com/r/atlassian/confluence-server
   #
-  repository: "atlassian/confluence-server"
-  
+  repository: "docker.atl-paas.net/atlassian/confluence-server"
+
   # -- Image pull policy
   #
   pullPolicy: IfNotPresent
-  
+
   # -- The docker image tag to be used - defaults to the Chart appVersion
   #
-  tag: "7.12.2-jdk11"
+  tag: "CONFA3CLUSTER-K8S36-2"
 
 # K8s ServiceAccount configuration. Give fine-grained identity and authorization 
 # to Pods
