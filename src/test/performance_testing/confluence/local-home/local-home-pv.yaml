@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: confluence-local-home-pv-0
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 200Gi
+  csi:
+    driver: ebs.csi.aws.com
+    fsType: ext4
+    volumeHandle: vol-010ecd4d49a6a4eee
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: topology.ebs.csi.aws.com/zone
+              operator: In
+              values:
+                - ap-southeast-2c
+  persistentVolumeReclaimPolicy: Retain
+  volumeMode: Filesystem
