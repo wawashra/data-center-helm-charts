@@ -11,6 +11,7 @@ spec:
     driver: ebs.csi.aws.com
     fsType: ext4
     volumeHandle: vol-010ecd4d49a6a4eee
+  storageClassName: "local-home"
   nodeAffinity:
     required:
       nodeSelectorTerms:

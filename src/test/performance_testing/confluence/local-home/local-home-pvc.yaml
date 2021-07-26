@@ -10,3 +10,4 @@ spec:
       storage: 200Gi
   volumeMode: Filesystem
   volumeName: confluence-local-home-pv-0
+  storageClassName: "local-home"
