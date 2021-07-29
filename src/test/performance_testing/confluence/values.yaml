@@ -127,7 +127,7 @@ database:
    # - 'jdbc:oracle:thin:@<dbhost>:1521:<SID>'
   # https://github.com/atlassian-labs/data-center-helm-charts/blob/master/docs/CONFIGURATION.md#databasejdbcurl
   #
-  url: "jdbc:postgresql://confluence-large-1-hdd.cvuoodawotyo.ap-southeast-2.rds.amazonaws.com:5432/atldb"
+  url: "jdbc:postgresql://confluence-large-restored-0.cvuoodawotyo.ap-southeast-2.rds.amazonaws.com:5432/atldb"
   
   # JDBC connection credentials
   # 
