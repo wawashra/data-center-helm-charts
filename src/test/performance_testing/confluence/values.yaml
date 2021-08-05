@@ -127,7 +127,7 @@ database:
    # - 'jdbc:oracle:thin:@<dbhost>:1521:<SID>'
   # https://github.com/atlassian-labs/data-center-helm-charts/blob/master/docs/CONFIGURATION.md#databasejdbcurl
   #
-  url: "jdbc:postgresql://confluence-large-restored-0.cvuoodawotyo.ap-southeast-2.rds.amazonaws.com:5432/atldb"
+  url: "jdbc:postgresql://confluence-large-1-hdd.cvuoodawotyo.ap-southeast-2.rds.amazonaws.com:5432/atldb"
   
   # JDBC connection credentials
   # 
@@ -179,7 +179,7 @@ volumes:
       # -- If 'true', then a 'PersistentVolume' and 'PersistentVolumeClaim' will be dynamically 
       # created for each pod based on the 'StorageClassName' supplied below.
       #   
-      create: false
+      create: true
       
       # -- Specify the name of the 'StorageClass' that should be used for the local-home 
       # volume claim.
@@ -191,7 +191,7 @@ volumes:
       #
       resources:
         requests:
-          storage: 500Gi
+          storage: 200Gi
           
     # -- Static provisioning of local-home using K8s PVs and PVCs
     #
@@ -205,9 +205,9 @@ volumes:
     # the bound 'persistentVolumeClaim.claimName' for the 'customVolume' object.
     # https://kubernetes.io/docs/concepts/storage/persistent-volumes/#static
     #
-    customVolume:
-      persistentVolumeClaim:
-        claimName: confluence-local-home-pvc-0
+    customVolume: {}
+    #  persistentVolumeClaim:
+    #    claimName: confluence-local-home-pvc-0
     
     # -- Specifies the path in the Confluence container to which the local-home volume will be 
     # mounted.
