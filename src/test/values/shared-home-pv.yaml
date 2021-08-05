@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: confluence-shared-home-pv
+spec:
+  capacity:
+    storage: 10Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  storageClassName: efs-pv
+  persistentVolumeReclaimPolicy: Retain
+  mountOptions:
+    - rw
+    - lookupcache=pos
+    - noatime
+    - intr
+    - _netdev
+  csi:
+    driver: efs.csi.aws.com
+    volumeHandle: fs-f8982bb8

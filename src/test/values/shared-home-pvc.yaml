@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: confluence-shared-home-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: efs-pv
+  volumeMode: Filesystem
+  volumeName: confluence-shared-home-pv
+  resources:
+    requests:
+      storage: 10Gi
