@@ -79,6 +79,12 @@
             <version>3.0.2</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>io.rest-assured</groupId>
+            <artifactId>rest-assured</artifactId>
+            <version>4.4.0</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <properties>
@@ -118,6 +124,14 @@
 
         <persistence.enabled>true</persistence.enabled>
         <clustering.enabled>true</clustering.enabled>
+        <!--
+            Number of instance replicas to start during initial setup. This value is currently only used by Bitbucket,
+            other products' values.yaml ignore this property. Other products need to perform additional setup steps on
+            a single node after Helm chart installation.
+        -->
+        <replica.count>2</replica.count>
+        <!-- Expected number of replicas after instance has been started -->
+        <target.replica.count>2</target.replica.count>
 
         <db.init.script.file/>
 
@@ -127,6 +141,10 @@
 
         <!-- The directory in which the helm (un)install script should look for the chart values files for integration testing -->
         <chart.testValues.basedir>${project.build.directory}/config</chart.testValues.basedir>
+
+        <!-- Deploy standalone Elasticsearch for BB? -->
+        <chart.testValues.es.deploy>true</chart.testValues.es.deploy>
+
     </properties>
 
     <build>
@@ -167,6 +185,7 @@
             -->
             <properties>
                 <chart.testValues.basedir>dummy</chart.testValues.basedir>
+                <chart.testValues.es.deploy>false</chart.testValues.es.deploy>
             </properties>
         </profile>
 

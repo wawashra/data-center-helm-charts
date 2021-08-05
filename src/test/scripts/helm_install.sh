@@ -1,14 +1,18 @@
 #!/usr/bin/env bash
 
+HELM_PARAMETERS_FILE=$1
+
 set -e
 set -x
+
+tasknum=0
 
 [ "$DOCKER_LTS_VERSION" ] && echo DOCKER_LTS_VERSION=$DOCKER_LTS_VERSION
 
 # Many of the variables used in this script are sourced from the
 # parameter file provided to it, i.e. `helm_parameters'. As such,
 # 'source' those values in
-source "$1"
+source "$HELM_PARAMETERS_FILE"
 
 get_current_cluster_type() {
   local server_address=$(kubectl config view --minify -o json | jq -r '.clusters[0].cluster.server')
@@ -36,7 +40,7 @@ get_current_cluster_type() {
 }
 
 check_bash_version() {
-  echo "Task 1 - Checking Bash version." >&2
+  echo "Task $((tasknum+=1)) - Checking Bash version." >&2
   if [ "${BASH_VERSINFO:-0}" -lt 4 ]; then
     echo "Your Bash version ${BASH_VERSINFO} is too old, update to version 5 or later."
     echo "If you're on OS X, you can follow this guide: https://itnext.io/upgrading-bash-on-macos-7138bd1066ba".
@@ -45,7 +49,7 @@ check_bash_version() {
 }
 
 check_for_jq() {
-  echo "Task 2 - Checking for presence of executable." >&2
+  echo "Task $((tasknum+=1)) - Checking for presence of executable." >&2
   if ! command -v jq &> /dev/null
   then
       echo "The 'jq' command line JSON processor is required to run this script."
@@ -54,11 +58,12 @@ check_for_jq() {
 }
 
 setup() {
-  echo "Task 3 - Performing preliminary setup." >&2
+  echo "Task $((tasknum+=1)) - Performing preliminary setup." >&2
   THISDIR=$(dirname "$0")
   RELEASE_PREFIX="$(echo "${RELEASE_PREFIX}" | tr '[:upper:]' '[:lower:]')"
   PRODUCT_RELEASE_NAME="$RELEASE_PREFIX-$PRODUCT_NAME"
   POSTGRES_RELEASE_NAME="$PRODUCT_RELEASE_NAME-pgsql"
+  ELASTICSEARCH_RELEASE_NAME="$PRODUCT_RELEASE_NAME-elasticsearch"
   FUNCTEST_RELEASE_NAME="$PRODUCT_RELEASE_NAME-functest"
   HELM_PACKAGE_DIR=target/helm
   [ "$HELM_DEBUG" = "true" ] && HELM_DEBUG_OPTION="--debug"
@@ -75,6 +80,7 @@ setup() {
   helm repo add bitnami https://charts.bitnami.com/bitnami --force-update
 
   mkdir -p "$LOG_DOWNLOAD_DIR"
+  touch $LOG_DOWNLOAD_DIR/helm_install_log.txt
 
   chartValueFiles=$(for file in $CHART_TEST_VALUES_BASEDIR/$PRODUCT_NAME/{values.yaml,values-${CLUSTER_TYPE}.yaml}; do
     ls "$file" 2>/dev/null || true
@@ -83,15 +89,14 @@ setup() {
 
 bootstrap_nfs() {
   local BASEDIR=$(dirname "$0")
-  echo "Task 4 - Bootstrapping NFS server." >&2
+  echo "Task $((tasknum+=1)) - Bootstrapping NFS server." >&2
   if grep -q nfs: ${chartValueFiles} /dev/null || grep -q 'nfs[.]' <<<"$EXTRA_PARAMETERS"; then
     echo "This configuration requires a private NFS server, starting..."
     "$BASEDIR"/start_nfs_server.sh "${TARGET_NAMESPACE}" "${PRODUCT_RELEASE_NAME}"
-    local nfs_server_pod_name=$(kubectl get pod -n "${TARGET_NAMESPACE}" -l role=${PRODUCT_RELEASE_NAME}-nfs-server -o jsonpath="{.items[0].metadata.name}")
 
     for ((try = 0; try < 60; try++)) ; do
       echo "Detecting NFS server IP..."
-      local nfs_server_ip=$(kubectl get pods -n $TARGET_NAMESPACE "$nfs_server_pod_name" -o json | jq -r .status.podIP)
+      local nfs_server_ip=$(kubectl get service -n "${TARGET_NAMESPACE}" -l "app.kubernetes.io/instance=$PRODUCT_RELEASE_NAME-nfs" -o jsonpath='{.items[0].spec.clusterIP}')
 
       if [ -z "$nfs_server_ip" ]; then
         echo "NFS server not found."
@@ -110,13 +115,14 @@ bootstrap_nfs() {
 }
 
 bootstrap_database() {
-  echo "Task 5 - Bootstrapping database server." >&2
+  echo "Task $((tasknum+=1)) - Bootstrapping database server." >&2
   # Use the product name for the name of the postgres database, username, and password.
   # These must match the credentials stored in the Secret preloaded into the namespace,
   # which the application will use to connect to the database.
+  PSQL_CHART_VALUES="$THISDIR/../infrastructure/postgres/postgres-values.yaml"
   helm install -n "${TARGET_NAMESPACE}" --wait --timeout 15m \
      "$POSTGRES_RELEASE_NAME" \
-     --values "$THISDIR/postgres-values.yaml" \
+     --values $PSQL_CHART_VALUES \
      --set fullnameOverride="$POSTGRES_RELEASE_NAME" \
      --set image.tag="$POSTGRES_APP_VERSION" \
      --set postgresqlDatabase="$DB_NAME" \
@@ -124,7 +130,7 @@ bootstrap_database() {
      --set postgresqlPassword="$PRODUCT_NAME" \
      --version "$POSTGRES_CHART_VERSION" \
      $HELM_DEBUG_OPTION \
-     bitnami/postgresql > $LOG_DOWNLOAD_DIR/helm_install_log.txt
+     bitnami/postgresql >> $LOG_DOWNLOAD_DIR/helm_install_log.txt
 
   if [[ "$DB_INIT_SCRIPT_FILE" ]]; then
     kubectl cp -n "${TARGET_NAMESPACE}" $DB_INIT_SCRIPT_FILE $POSTGRES_RELEASE_NAME-0:/tmp/db-init-script.sql
@@ -132,9 +138,32 @@ bootstrap_database() {
   fi
 }
 
+bootstrap_elasticsearch() {
+  echo "Task $((tasknum+=1)) - Bootstrapping Elasticsearch cluster." >&2
+  if grep -qi elasticsearch: ${chartValueFiles} /dev/null || grep -qi 'elasticsearch[.]' <<<"$EXTRA_PARAMETERS"; then
+      HAS_ES_CONFIG=1
+  fi
+  if [[ "$ELASTICSEARCH_DEPLOY" != "true" || -z "$HAS_ES_CONFIG"  ]]; then
+      echo "No Elasticsearch chart or config defined, skipping provisioning"
+      return
+  fi
+  ES_CHART_VALUES="$THISDIR/../infrastructure/elasticsearch/elasticsearch-values.yaml"
+
+  helm install -n "${TARGET_NAMESPACE}" --wait --timeout 15m \
+     "$ELASTICSEARCH_RELEASE_NAME" \
+     --values $ES_CHART_VALUES \
+     --set image.tag="$ELASTICSEARCH_APP_VERSION" \
+     --version "$ELASTICSEARCH_CHART_VERSION" \
+     $HELM_DEBUG_OPTION \
+     bitnami/elasticsearch >> $LOG_DOWNLOAD_DIR/helm_install_log.txt
+
+  # Flag as installed for post-install tests.
+  echo "\nELASTICSEARCH_INSTALLED=1" > "$HELM_PARAMETERS_FILE"
+}
+
 # Package the product's Helm chart
 package_product_helm_chart() {
-  echo "Task 6 - Packaging product helm chart." >&2
+  echo "Task $((tasknum+=1)) - Packaging product helm chart." >&2
   for chartValueFile in $chartValueFiles; do
     valueOverrides+="--values $chartValueFile "
   done
@@ -165,7 +194,7 @@ package_product_helm_chart() {
 
 # Package the functest Helm chart
 package_functest_helm_chart() {
-  echo "Task 7 - Packaging functional tests helm chart." >&2
+  echo "Task $((tasknum+=1)) - Packaging functional tests helm chart." >&2
   INGRESS_DOMAIN_VARIABLE_NAME="INGRESS_DOMAIN_$CLUSTER_TYPE"
   INGRESS_DOMAIN="${!INGRESS_DOMAIN_VARIABLE_NAME}"
   FUNCTEST_CHART_PATH="$THISDIR/../charts/functest"
@@ -177,12 +206,17 @@ package_functest_helm_chart() {
   local backdoor_services="backdoorServiceNames:${NEWLINE}"
   local ingress_services="ingressNames:${NEWLINE}"
   ingress_services+="- ${PRODUCT_RELEASE_NAME}${NEWLINE}"
-  for ((NODE = 0; NODE < ${TARGET_REPLICA_COUNT:-0}; NODE += 1))
-  do
+  for ((NODE = 0; NODE < ${TARGET_REPLICA_COUNT:-0}; NODE += 1)); do
     backdoor_services+="- ${PRODUCT_RELEASE_NAME}-${NODE}${NEWLINE}"
   done
+  if [[ ! -z "$ES_CHART_VALUES" ]]; then
+    echo "Elasticsearch is being deployed, adding a backdoor"
+    backdoor_services+="- ${PRODUCT_RELEASE_NAME}-elasticsearch-master-0${NEWLINE}"
+  fi
   EXPOSE_NODES_FILE="${LOG_DOWNLOAD_DIR}/${PRODUCT_RELEASE_NAME}-service-expose.yaml"
 
+  echo "Defining ingress/backdoor services as:"
+  echo "${backdoor_services}${ingress_services}"
   echo "${backdoor_services}${ingress_services}" > ${EXPOSE_NODES_FILE}
 
   helm template \
@@ -197,7 +231,7 @@ package_functest_helm_chart() {
 
 # Install the product's Helm chart
 install_product() {
-  echo "Task 8 - Installing product helm chart." >&2
+  echo "Task $((tasknum+=1)) - Installing product helm chart." >&2
   helm install -n "${TARGET_NAMESPACE}" --wait --timeout 15m \
      "$PRODUCT_RELEASE_NAME" \
      $HELM_DEBUG_OPTION \
@@ -207,7 +241,7 @@ install_product() {
 
 # Install the functest Helm chart
 install_functional_tests() {
-  echo "Task 9 - Installing functional tests." >&2
+  echo "Task $((tasknum+=1)) - Installing functional tests." >&2
   helm install --wait --timeout 15m \
      -n "${TARGET_NAMESPACE}" \
      "$FUNCTEST_RELEASE_NAME" \
@@ -219,7 +253,7 @@ install_functional_tests() {
 
 # Wait until the Ingress we just created starts serving up non-error responses - there may be a lag
 wait_for_ingress() {
-  echo "Task 10 - Waiting for Ingress to come up." >&2
+  echo "Task $((tasknum+=1)) - Waiting for Ingress to come up." >&2
   if [[ "$CLUSTER_TYPE" == "CUSTOM" ]]; then
     INGRESS_URI="${CUSTOM_INGRESS_URI}"
   else
@@ -242,7 +276,7 @@ wait_for_ingress() {
 
 # Run the chart's tests
 run_tests() {
-  echo "Task 11 - Running tests." >&2
+  echo "Task $((tasknum+=1)) - Running tests." >&2
   helm test \
   $HELM_DEBUG_OPTION \
   "$PRODUCT_RELEASE_NAME" -n "${TARGET_NAMESPACE}"
@@ -254,6 +288,7 @@ check_for_jq
 setup
 bootstrap_nfs
 bootstrap_database
+bootstrap_elasticsearch
 package_product_helm_chart
 package_functest_helm_chart
 install_product

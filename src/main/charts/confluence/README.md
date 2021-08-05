@@ -1,6 +1,6 @@
 # confluence
 
-![Version: 0.12.0](https://img.shields.io/badge/Version-0.12.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 7.12.2-jdk11](https://img.shields.io/badge/AppVersion-7.12.2--jdk11-informational?style=flat-square)
+![Version: 0.14.0](https://img.shields.io/badge/Version-0.14.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 7.12.3-jdk11](https://img.shields.io/badge/AppVersion-7.12.3--jdk11-informational?style=flat-square)
 
 A chart for installing Confluence Data Center on Kubernetes
 
@@ -52,6 +52,7 @@ Kubernetes: `>=1.19.x-0`
 | confluence.resources.jvm.reservedCodeCache | string | `"256m"` | The memory reserved for the Confluence JVM code cache |
 | confluence.securityContext.enabled | bool | `true` | Set to 'true' to enable the security context |
 | confluence.securityContext.gid | string | `"2002"` | The GID used by the Confluence docker image |
+| confluence.service.annotations | object | `{}` | Additional annotations to apply to the Service |
 | confluence.service.contextPath | string | `nil` | The Tomcat context path that Confluence will use. The ATL_TOMCAT_CONTEXTPATH  will be set automatically. |
 | confluence.service.port | int | `80` | The port on which the Confluence K8s Service will listen |
 | confluence.service.type | string | `"ClusterIP"` | The type of K8s service to use for Confluence |
@@ -62,6 +63,7 @@ Kubernetes: `>=1.19.x-0`
 | database.credentials.usernameSecretKey | string | `"username"` | The key ('username') in the Secret used to store the database login username |
 | database.type | string | `nil` | The database type that should be used. If not specified, then it will need to be  provided via the browser during manual configuration post deployment. Valid values  include: - 'postgresql' - 'mysql' - 'oracle' - 'mssql' https://github.com/atlassian-labs/data-center-helm-charts/blob/master/docs/CONFIGURATION.md#databasetype |
 | database.url | string | `nil` | The jdbc URL of the database. If not specified, then it will need to be provided  via the browser during manual configuration post deployment. Example URLs include: - 'jdbc:postgresql://<dbhost>:5432/<dbname>' - 'jdbc:mysql://<dbhost>/<dbname>' - 'jdbc:sqlserver://<dbhost>:1433;databaseName=<dbname>' - 'jdbc:oracle:thin:@<dbhost>:1521:<SID>' https://github.com/atlassian-labs/data-center-helm-charts/blob/master/docs/CONFIGURATION.md#databasejdbcurl |
+| fluentd.command | string | `nil` | The command used to start Fluentd. If not supplied the default command  will be used: "fluentd -c /fluentd/etc/fluent.conf -v" Note: The custom command can be free-form, however pay particular attention to the process that should ultimately be left running in the container. This process should be invoked with 'exec' so that signals are appropriately propagated to it, for instance SIGTERM. An example of how such a command may look is: "<command 1> && <command 2> && exec <primary command>" |
 | fluentd.customConfigFile | bool | `false` | Set to 'true' if a custom config (see 'configmap-fluentd.yaml' for default)  should be used for Fluentd. If enabled this config must supplied via the  'fluentdCustomConfig' property below. |
 | fluentd.elasticsearch.enabled | bool | `true` | Set to 'true' if Fluentd should send all log events to an Elasticsearch service. |
 | fluentd.elasticsearch.hostname | string | `"elasticsearch"` | The hostname of the Elasticsearch service that Fluentd should send logs to. |

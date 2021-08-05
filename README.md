@@ -16,28 +16,9 @@ stabilized.
 
 Also, we **don’t officially support** the functionality described in the [examples](docs/examples) or the documented [platforms](docs/PLATFORMS.md). You should use them for reference only. 
 
-## Architecture
+## Documentation
 
-The diagram below provides a high level overview of what a typical deployment might look like when using the Atlassian Data Center Helm charts:
-
-![architecture](./docs/images/k8s-overview.png "Request routing via Ingress")
-
-## Installing the Helm charts
-
-* [Prerequisites and setup](docs/PREREQUISITES.md) - everything you need to do before installing the Helm charts
-* [Installation](docs/INSTALLATION.md) - the steps to install the Helm charts
-
-## Additional content
-
-* [Operation](docs/OPERATION.md) - how to upgrade applications, scale your cluster, and update resources
-* [Configuration](docs/CONFIGURATION.md) - a deep dive into the configuration parameters
-* [Platforms support](docs/PLATFORMS.md) - how to allow support for different platforms
-* [Examples](docs/examples/)
-  * [How to deploy an EFK stack to Kubernetes](docs/examples/logging/efk/EFK.md)
-  * [Implementation of an NFS Server for Bitbucket](docs/examples/storage/nfs/NFS.md)
-  * [Local storage - utilizing AWS EBS-backed volumes](docs/examples/storage/aws/LOCAL_STORAGE.md)
-  * [Shared storage - utilizing AWS EFS-backed filesystem](docs/examples/storage/aws/SHARED_STORAGE.md)
-  * [SSH service in Bitbucket on Kubernetes](docs/examples/ssh/SSH_BITBUCKET.md)
+We provide [extensive documentation](https://atlassian-labs.github.io/data-center-helm-charts/) to support our Helm charts. This includes prerequisites, set up, installation, examples, and more.
 
 ## Feedback
 

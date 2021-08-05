@@ -34,6 +34,24 @@ Create chart name and version as used by the chart label.
 {{- end }}
 
 {{/*
+Create default value for ingress port
+*/}}
+{{- define "jira.ingressPort" -}}
+{{ default (ternary "443" "80" .Values.ingress.https) .Values.ingress.port -}}
+{{- end }}
+
+{{/*
+Create default value for ingress path
+*/}}
+{{- define "jira.ingressPath" -}}
+{{- if .Values.ingress.path -}}
+{{- .Values.ingress.path -}}
+{{- else -}}
+{{ default ( "/" ) .Values.jira.service.contextPath -}}
+{{- end }}
+{{- end }}
+
+{{/*
 The name of the service account to be used.
 If the name is defined in the chart values, then use that,
 else if we're creating a new service account then use the name of the Helm release,
@@ -82,6 +100,17 @@ The command that should be run by the nfs-fixer init container to correct the pe
 {{ .Values.volumes.sharedHome.nfsPermissionFixer.command }}
 {{- else }}
 {{- printf "(chgrp %s %s; chmod g+w %s)" .Values.jira.securityContext.gid .Values.volumes.sharedHome.nfsPermissionFixer.mountPath .Values.volumes.sharedHome.nfsPermissionFixer.mountPath }}
+{{- end }}
+{{- end }}
+
+{{/*
+The command that should be run to start the fluentd service
+*/}}
+{{- define "fluentd.start.command" -}}
+{{- if .Values.fluentd.command }}
+{{ .Values.fluentd.command }}
+{{- else }}
+{{- print "exec fluentd -c /fluentd/etc/fluent.conf -v" }}
 {{- end }}
 {{- end }}
 
