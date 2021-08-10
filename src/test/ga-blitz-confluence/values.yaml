@@ -143,7 +143,7 @@ database:
     # --from-literal=password=<password>'
     # https://kubernetes.io/docs/concepts/configuration/secret/#opaque-secrets
     #
-    secretName:
+    secretName: confluence-db-credentials
     
     # -- The key ('username') in the Secret used to store the database login username
     #
@@ -274,7 +274,7 @@ volumes:
       # can write to it. This is a workaround for a K8s bug affecting NFS volumes: 
       # https://github.com/kubernetes/examples/issues/260
       #
-      enabled: false
+      enabled: true
       
       # -- The path in the K8s initContainer where the shared-home volume will be mounted
       #
@@ -431,11 +431,11 @@ confluence:
     # 'kubectl create secret generic <secret-name> --from-literal=license-key=<license> 
     # https://kubernetes.io/docs/concepts/configuration/secret/#opaque-secrets
     #
-    secretName:
+    secretName: confluence-license
     
     # -- The key in the K8s Secret that contains the Confluence license key
     #
-    secretKey: license-key
+    secretKey: license
     
   # Confirm that Confluence is up and running with a ReadinessProbe
   # https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#define-readiness-probes
@@ -481,7 +481,7 @@ confluence:
     # -- Set to 'true' if Data Center clustering should be enabled
     # This will automatically configure cluster peer discovery between cluster nodes.
     #
-    enabled: false
+    enabled: true
     
     # -- Set to 'true' if the K8s pod name should be used as the end-user-visible 
     # name of the Data Center cluster node.
@@ -547,10 +547,10 @@ confluence:
   # volume's root directory. Optionally, a subDirectory field can be included to 
   # specify which directory in the volume contains the library file.
   #
-  additionalLibraries: []
-  #   - volumeName:
-  #     subDirectory:
-  #     fileName:
+  additionalLibraries:
+    - volumeName: shared-home
+      subDirectory: lib
+      fileName: mysql-connector-java-8.0.26.jar
 
   # -- Specifies a list of additional Confluence plugins that should be added to the 
   # Confluence container. Note plugins installed via this method will appear as 
@@ -591,7 +591,7 @@ synchrony:
   # -- Set to 'true' if Synchrony (i.e. collaborative editing) should be enabled.
   # This will result in a separate StatefulSet and Service to be created for Synchrony.
   # If disabled, then collaborative editing will be disabled in Confluence.
-  enabled: false
+  enabled: true
   
   # K8s Synchrony Service configuration
   #
@@ -685,10 +685,10 @@ synchrony:
   # volume's root directory. Optionally, a subDirectory field can be included to 
   # specify which directory in the volume contains the library file.
   #
-  additionalLibraries: []
-  #   - volumeName:
-  #     subDirectory:
-  #     fileName:
+  additionalLibraries:
+    - volumeName: shared-home
+      subDirectory: lib
+      fileName: mysql-connector-java-8.0.26.jar
 
 # Fluentd configuration 
 #
