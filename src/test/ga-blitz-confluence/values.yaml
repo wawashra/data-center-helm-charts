@@ -551,7 +551,7 @@ confluence:
   additionalLibraries:
     - volumeName: shared-home
       subDirectory: lib
-      fileName: mysql-connector-java-8.0.26.jar
+      fileName: mysql-connector-java-8.0.19.jar
 
   # -- Specifies a list of additional Confluence plugins that should be added to the 
   # Confluence container. Note plugins installed via this method will appear as 
@@ -689,7 +689,7 @@ synchrony:
   additionalLibraries:
     - volumeName: shared-home
       subDirectory: lib
-      fileName: mysql-connector-java-8.0.26.jar
+      fileName: mysql-connector-java-8.0.19.jar
 
 # Fluentd configuration 
 #
