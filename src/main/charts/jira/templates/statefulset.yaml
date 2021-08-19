@@ -106,6 +106,14 @@ spec:
             - name: ehcacheobject
               containerPort: {{ .Values.jira.ports.ehcacheobject }}
               protocol: TCP
+          startupProbe:
+            failureThreshold: 30
+            periodSeconds: 10
+            exec:
+              command:
+                - bash
+                - -c
+                - 'curl http://localhost:8080/status | grep FIRST_RUN || [[ $(find caches/indexesV1/issues/ -type f | wc -l) -gt 1 ]]'
           readinessProbe:
             httpGet:
               port: {{ .Values.jira.ports.http }}
