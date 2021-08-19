@@ -541,7 +541,7 @@ confluence:
     #
     - -XX:ActiveProcessorCount=2
     - -Dtest.kubernetes.system.property=something
-  
+
   # -- Specifies a list of additional Java libraries that should be added to the 
   # Confluence container. Each item in the list should specify the name of the volume 
   # that contains the library, as well as the name of the library file within that 
