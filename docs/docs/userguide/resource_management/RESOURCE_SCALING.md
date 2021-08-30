@@ -26,6 +26,26 @@ At present there are issues relating to index replication with Jira when immedia
 
 To overcome these issue you need to take the following approach:
 
+* Prepare Jira for scaling by providing an index snapshot
+
+  Make sure there's at least one snapshot file in
+  `<shared-home>/export/indexsnapshots`. New pods will attempt to use
+  these files to replicate issue index which is more reliable than
+  copying index from pods directly. If you migrated shared home from an
+  existing instance, snapshots should be available. If not, follow
+  these steps to generate them before scaling Jira:
+
+  1. Log into the Jira pod. There should be only one at this time
+  1. Go to Admin -> System -> Advanced -> Indexing.
+  1. There should be no errors on this page. If there are, you need to
+  1  perform a full re-index before proceeding.
+  1. Go to Index Recovery settings visible on the same page.
+  1. Remember current settings
+  1. Temporarly change the values: Set "Enable index recovery" to "ON". Under "Schdedule" choose "Advanced" and paste this cron expression into the input field: ~* * * * * ?~
+  1. The above step will force the snapshot to be created every minute.
+  1. Wait for the snapshot to be created. It will show as an archive in `<shared-home>/export/indexsnapshots`.
+  1. Revert the settings to the remembered values but consider keeping the index recovery feature enabled.
+
 * Using either the `declarative` or `impreative` approach scale the cluster by **1 pod only**
 !!!warning "1 pod as a time!"
       
