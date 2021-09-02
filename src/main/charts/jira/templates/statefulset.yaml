@@ -48,21 +48,9 @@ spec:
           image: {{ include "jira.image" . | quote }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
-            {{ if .Values.ingress.https }}
-            - name: ATL_TOMCAT_SCHEME
-              value: "https"
-            - name: ATL_TOMCAT_SECURE
-              value: "true"
-            {{ end }}
             {{ if .Values.jira.service.contextPath }}
             - name: ATL_TOMCAT_CONTEXTPATH
               value: {{ .Values.jira.service.contextPath | quote }}
-            {{ end }}
-            {{ if .Values.ingress.host }}
-            - name: ATL_PROXY_NAME
-              value: {{ .Values.ingress.host | quote }}
-            - name: ATL_PROXY_PORT
-              value: {{ include "jira.ingressPort" . | quote }}
             {{ end }}
             {{- include "jira.databaseEnvVars" . | nindent 12 }}
             {{- include "jira.clusteringEnvVars" . | nindent 12 }}
