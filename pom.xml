@@ -128,6 +128,7 @@
 
         <persistence.enabled>true</persistence.enabled>
         <clustering.enabled>true</clustering.enabled>
+        <jvm.parameters></jvm.parameters>
         <!--
             Number of instance replicas to start during initial setup. This value is currently only used by Bitbucket,
             other products' values.yaml ignore this property. Other products need to perform additional setup steps on

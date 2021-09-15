@@ -8,6 +8,7 @@ jira:
     - -Djira.websudo.is.disabled=true 
     - -Datlassian.allow.insecure.url.parameter.login=true
     - -XX:ActiveProcessorCount=2
+    - ${jvm.parameters}
 database:
   type: postgres72
   url: jdbc:postgresql://${helm.release.prefix}-jira-pgsql:5432/jira
