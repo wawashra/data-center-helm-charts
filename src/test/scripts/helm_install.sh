@@ -2,6 +2,10 @@
 
 HELM_PARAMETERS_FILE=$1
 
+if [ -n "$2" ]; then
+    INSTALL_AND_UPGRADE='true'
+fi
+
 set -e
 set -x
 
@@ -66,6 +70,8 @@ setup() {
   ELASTICSEARCH_RELEASE_NAME="$PRODUCT_RELEASE_NAME-elasticsearch"
   FUNCTEST_RELEASE_NAME="$PRODUCT_RELEASE_NAME-functest"
   HELM_PACKAGE_DIR=target/helm
+  HELM_PACKAGE_CHART="${HELM_PACKAGE_DIR}/${PRODUCT_NAME}-*.tgz"
+  HELM_PREVIOUS_VERSION=''
   [ "$HELM_DEBUG" = "true" ] && HELM_DEBUG_OPTION="--debug"
 
   local current_context=$(kubectl config current-context)
@@ -86,6 +92,24 @@ setup() {
     ls "$file" 2>/dev/null || true
   done)
 }
+
+set_helm_versions()
+  if [ -n "$INSTALL_AND_UPGRADE" ]; then
+    # Add atlassian-data-center to local registry
+    helm repo add atlassian-data-center \
+         https://atlassian.github.io/data-center-helm-charts
+    helm repo update
+
+    # detect the most recent two versions of Helm chart releases in github
+    latest_versions=$(git tag --list "$PRODUCT_NAME-*" --sort=v:refname | tail -2)
+    read -r lastver newver <<< "${latest_versions//$'\n'/ }"
+
+    IFS="-" read -r product HELM_LATEST_VERSION <<<"$newver"
+    IFS="-" read -r product HELM_PREVIOUS_VERSION <<<"$lastver"
+
+    HELM_PACKAGE_CHART="atlassian-data-center/${PRODUCT_NAME} --version"
+    echo "Upgrading $product: $HELM_PREVIOUS_VERSION => $HELM_LATEST_VERSION"
+  fi
 
 bootstrap_nfs() {
   local BASEDIR=$(dirname "$0")
@@ -233,7 +257,7 @@ install_product() {
      "$PRODUCT_RELEASE_NAME" \
      $HELM_DEBUG_OPTION \
      ${valueOverrides} \
-     "$HELM_PACKAGE_DIR/${PRODUCT_NAME}"-*.tgz >> $LOG_DOWNLOAD_DIR/helm_install_log.txt
+     ${HELM_PACKAGE_CHART} $HELM_PREVIOUS_VERSION >> $LOG_DOWNLOAD_DIR/helm_install_log.txt
 }
 
 # Install the functest Helm chart
@@ -247,6 +271,18 @@ install_functional_tests() {
      $HELM_DEBUG_OPTION \
      "$HELM_PACKAGE_DIR/functest-0.1.0.tgz"
 }
+
+# Upgrade the product's Helm chart
+upgrade_product() {
+  echo "Task $((tasknum+=1)) - Upgrading product helm chart." >&2
+  helm upgrade -n "${TARGET_NAMESPACE}" --wait --timeout 15m \
+     "$PRODUCT_RELEASE_NAME" \
+     $HELM_DEBUG_OPTION \
+     --replicaCount=1 \
+     --reuse-values \
+     "atlassian-data-center/${PRODUCT_NAME}" $HELM_LATEST_VERSION>> $LOG_DOWNLOAD_DIR/helm_install_log.txt
+}
+
 
 # Wait until the Ingress we just created starts serving up non-error responses - there may be a lag
 wait_for_ingress() {
@@ -292,5 +328,10 @@ install_product
 install_functional_tests
 wait_for_ingress
 run_tests
+if [ -n "$INSTALL_AND_UPGRADE" ]; then
+    upgrade_product
+    wait_for_ingress
+    run_tests
+fi
 
 exit 0
