@@ -278,7 +278,7 @@ upgrade_product() {
   helm upgrade -n "${TARGET_NAMESPACE}" --wait --timeout 15m \
      "$PRODUCT_RELEASE_NAME" \
      $HELM_DEBUG_OPTION \
-     --replicaCount=1 \
+     --set replicaCount=1 \
      --reuse-values \
      ${HELM_PACKAGE_CHART} $HELM_LATEST_VERSION>> $LOG_DOWNLOAD_DIR/helm_install_log.txt
 }
