@@ -280,7 +280,7 @@ upgrade_product() {
      $HELM_DEBUG_OPTION \
      --replicaCount=1 \
      --reuse-values \
-     "atlassian-data-center/${PRODUCT_NAME}" $HELM_LATEST_VERSION>> $LOG_DOWNLOAD_DIR/helm_install_log.txt
+     ${HELM_PACKAGE_CHART} $HELM_LATEST_VERSION>> $LOG_DOWNLOAD_DIR/helm_install_log.txt
 }
 
 
