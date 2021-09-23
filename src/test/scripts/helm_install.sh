@@ -93,7 +93,7 @@ setup() {
   done)
 }
 
-set_helm_versions()
+set_helm_upgrade_versions() {
   if [ -n "$INSTALL_AND_UPGRADE" ]; then
     # Add atlassian-data-center to local registry
     helm repo add atlassian-data-center \
@@ -110,6 +110,7 @@ set_helm_versions()
     HELM_PACKAGE_CHART="atlassian-data-center/${PRODUCT_NAME} --version"
     echo "Upgrading $product: $HELM_PREVIOUS_VERSION => $HELM_LATEST_VERSION"
   fi
+}
 
 bootstrap_nfs() {
   local BASEDIR=$(dirname "$0")
@@ -319,6 +320,9 @@ run_tests() {
 check_bash_version
 check_for_jq
 setup
+if [ -n "$INSTALL_AND_UPGRADE" ]; then
+  set_helm_upgrade_versions
+fi
 bootstrap_nfs
 bootstrap_database
 bootstrap_elasticsearch
