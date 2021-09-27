@@ -86,7 +86,7 @@ database:
    # - 'mssql'
   # https://atlassian.github.io/data-center-helm-charts/userguide/CONFIGURATION/#databasetype
   #
-  type: 
+  type: postgresql
   
   # -- The jdbc URL of the database. If not specified, then it will need to be provided 
   # via the browser during manual configuration post deployment. Example URLs include:
@@ -96,7 +96,7 @@ database:
    # - 'jdbc:oracle:thin:@<dbhost>:1521:<SID>'
   # https://atlassian.github.io/data-center-helm-charts/userguide/CONFIGURATION/#databaseurl
   #
-  url:
+  url: jdbc:postgresql://postgres-db.bamboo.svc.cluster.local:5432/bamboo
    
   # JDBC connection credentials
   # 
@@ -112,7 +112,7 @@ database:
     # --from-literal=password=<password>'
     # https://kubernetes.io/docs/concepts/configuration/secret/#opaque-secrets
     #
-    secretName:
+    secretName: postgres-db
      
     # -- The key ('username') in the Secret used to store the database login username
     #
@@ -148,12 +148,12 @@ volumes:
       # -- If 'true', then a 'PersistentVolume' and 'PersistentVolumeClaim' will be dynamically 
       # created for each pod based on the 'StorageClassName' supplied below.
       #          
-      create: false
+      create: true
       
       # -- Specify the name of the 'StorageClass' that should be used for the local-home 
       # volume claim.
       #
-      storageClassName:
+      storageClassName: "bamboo-local-home"
       
       # -- Specifies the standard K8s resource requests and/or limits for the local-home 
       # volume claims.
@@ -221,9 +221,9 @@ volumes:
     # https://kubernetes.io/docs/concepts/storage/persistent-volumes/#static
     # https://atlassian.github.io/data-center-helm-charts/examples/storage/aws/SHARED_STORAGE/
     #
-    customVolume: {}
-    # persistentVolumeClaim:
-    #   claimName: "<pvc>"
+    customVolume:
+      persistentVolumeClaim:
+        claimName: "shared-home-claim"
     
     # -- Specifies the path in the Bamboo container to which the shared-home volume will be 
     # mounted.
@@ -274,7 +274,7 @@ ingress:
   # -- Set to 'true' if an Ingress Resource should be created. This depends on a 
   # pre-provisioned Ingress Controller being available.
   # 
-  create: false
+  create: true
   
   # -- Set to 'true' if the Ingress Resource is to use the K8s 'ingress-nginx' 
   # controller. 
@@ -296,7 +296,7 @@ ingress:
   # this hostname will be routed by the Ingress Resource to the appropriate backend 
   # Service.
   #
-  host:
+  host: "bamboo-k8s.deplops.com"
    
   # -- The base path for the Ingress Resource. For example '/bamboo'. Based on a 
   # 'ingress.host' value of 'company.k8s.com' this would result in a URL of 
@@ -307,7 +307,8 @@ ingress:
   # -- The custom annotations that should be applied to the Ingress Resource 
   # when NOT using the K8s ingress-nginx controller.
   #
-  annotations: {}
+  annotations:
+    cert-manager.io/issuer: "letsencrypt-prod" # Using https://letsencrypt.org/
   
   # -- Set to 'true' if browser communication with the application should be TLS 
   # (HTTPS) enforced.
@@ -323,7 +324,7 @@ ingress:
   # https://kubernetes.io/docs/concepts/configuration/secret/#tls-secrets
   # https://kubernetes.io/docs/concepts/services-networking/ingress/#tls
   #
-  tlsSecretName:
+  tlsSecretName: "tls-certificate"
 
 # Bamboo configuration 
 #
